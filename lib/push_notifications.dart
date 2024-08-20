@@ -2,11 +2,23 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pushtrial/main.dart';
+import 'package:pushtrial/api/api.dart';
+import 'package:pushtrial/models/user_data.dart';
+import 'package:pushtrial/models/user.dart';
+import 'package:pushtrial/models/taphistory.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class PushNotifications {
   static final _firebaseMessaging = FirebaseMessaging.instance;
   static final FlutterLocalNotificationsPlugin
       _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static User user = UserData.myUser;
+  static int? studid;
+  static String? userFirstName;
+
+  static List<TapHistory>? data;
+
   static Future init() async {
     await _firebaseMessaging.requestPermission(
       alert: true,
@@ -67,7 +79,7 @@ class PushNotifications {
 
   static void onNotificationTap(NotificationResponse notificationResponse) {
     navigatorKey.currentState!
-        .pushNamed("/message", arguments: notificationResponse);
+        .pushNamed("/notifications", arguments: notificationResponse);
   }
 
   static Future showSimpleNotification({
@@ -76,8 +88,8 @@ class PushNotifications {
     required String payload,
   }) async {
     const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails('your channel id', 'your channel name',
-            channelDescription: 'your channel description',
+        AndroidNotificationDetails('your_channel_id', 'Essentiel',
+            channelDescription: 'Essentiel Notifications',
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker');
@@ -85,5 +97,43 @@ class PushNotifications {
         NotificationDetails(android: androidNotificationDetails);
     await _flutterLocalNotificationsPlugin
         .show(0, title, body, notificationDetails, payload: payload);
+  }
+
+  static Future getUser() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final json = preferences.getString('user');
+    user = json == null ? UserData.myUser : User.fromJson(jsonDecode(json));
+    print('User data: $user');
+
+    studid = user.id;
+    userFirstName = user.firstname;
+  }
+
+  static Future getTapHistory() async {
+    if (studid == null) {
+      print('Student ID is not set.');
+      return;
+    }
+
+    try {
+      final response = await CallApi().getTapHistory(studid!);
+
+      if (response.statusCode == 200) {
+        if (response.body.isEmpty) {
+          print('No data returned');
+          return;
+        }
+
+        Iterable list = json.decode(response.body);
+        data = list.map((model) => TapHistory.fromJson(model)).toList();
+
+        print('Retrieved tap history: $data');
+      } else {
+        print(
+            'Failed to load tap history. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Exception occurred: $e');
+    }
   }
 }

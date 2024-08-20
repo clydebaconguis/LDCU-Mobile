@@ -8,9 +8,9 @@ import 'package:pushtrial/models/user_data.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 
 class NotificationsScreen extends StatefulWidget {
-  final VoidCallback onNotificationsViewed;
+  // final VoidCallback onNotificationsViewed;
 
-  NotificationsScreen({required this.onNotificationsViewed});
+  // NotificationsScreen({required this.onNotificationsViewed});
 
   @override
   _NotificationsScreenState createState() => _NotificationsScreenState();

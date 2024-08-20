@@ -1,14 +1,16 @@
 import 'dart:convert';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pushtrial/message.dart';
 import 'package:pushtrial/push_notifications.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
-import 'home.dart';
+import '../models/user.dart';
+import 'auth/login.dart';
+import 'screens/loading.dart';
+import 'screens/home.dart';
+import 'screens/notifications.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -47,7 +49,8 @@ void main() async {
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     if (message.notification != null) {
       print("Background Notification Tapped");
-      navigatorKey.currentState!.pushNamed("/message", arguments: message);
+      navigatorKey.currentState!
+          .pushNamed("/notifications", arguments: message);
     }
   });
 
@@ -84,7 +87,8 @@ void main() async {
   if (message != null) {
     print("Launched from terminated state");
     Future.delayed(Duration(seconds: 1), () {
-      navigatorKey.currentState!.pushNamed("/message", arguments: message);
+      navigatorKey.currentState!
+          .pushNamed("/notifications", arguments: message);
     });
   }
   runApp(const MyApp());
@@ -93,19 +97,26 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: navigatorKey,
-      title: 'Push Notifications',
+      title: 'Student Portal',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
       ),
+      initialRoute: '/loading',
       routes: {
-        '/': (context) => const HomePage(),
-        '/message': (context) => const Message()
+        '/loading': (context) => LoadingScreen(),
+        '/login': (context) => Login(),
+        '/home': (context) {
+          final user = ModalRoute.of(context)!.settings.arguments as User?;
+          if (user == null) {
+            return Login();
+          }
+          return HomeScreen(user: user);
+        },
+        '/notifications': (context) => NotificationsScreen(),
       },
     );
   }
