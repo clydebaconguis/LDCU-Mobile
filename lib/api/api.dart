@@ -5,7 +5,7 @@ class CallApi {
   // final String _mainDomain = "https://app-ldcu.essentiel.ph/";
   // final String _mainDomain = "http://127.0.0.1:8000/";
   final String _mainDomain = "http://192.168.50.13:8000/";
-  final String _onlineDomain = "https://app-ldcu.essentiel.ph/";
+  final String _onlineDomain = "http://192.168.50.13:8000/";
   final String _esDomain = "api/mobile/api_login";
   final String _enrollmentInfo = "api/mobile/api_enrollmentinfo";
   final String _enrollmentData = "api/mobile/api_enrollmentdata";
@@ -22,10 +22,25 @@ class CallApi {
   final String _taphistory = "api/mobile/api_get_taphistory";
   final String _updatePushStatus = "api/mobile/api_update_pushstatus";
   final String _transactions = "api/mobile/api_get_transactions";
+  final String _saveToken = "api/mobile/api_save_fcmtoken";
 
   getSchoolInfo() async {
     var fullUrl = '$_mainDomain$_schoolinfo';
     return await http.get(
+      Uri.parse(fullUrl),
+    );
+  }
+
+  // getSaveToken(studid, fcmtoken) async {
+  //   var fullUrl = '$_mainDomain$_saveToken?studid=$studid&fcmtoken=$fcmtoken';
+  //   return await http.post(
+  //     Uri.parse(fullUrl),
+  //   );
+  // }
+
+  getSaveToken(int studid, String fcmtoken) async {
+    var fullUrl = '$_mainDomain$_saveToken?studid=$studid&fcmtoken=$fcmtoken';
+    return await http.post(
       Uri.parse(fullUrl),
     );
   }

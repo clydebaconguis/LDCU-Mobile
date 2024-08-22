@@ -86,7 +86,7 @@ class _LoginState extends State<Login> {
           ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(left: 50, right: 50, bottom: 70),
+          padding: const EdgeInsets.only(left: 50, right: 50, bottom: 80),
           child: Form(
             key: _formKey,
             child: Column(
@@ -108,7 +108,7 @@ class _LoginState extends State<Login> {
                     // color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 25),
                 TextFormField(
                   controller: _usernameController,
                   decoration: InputDecoration(

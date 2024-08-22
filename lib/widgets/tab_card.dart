@@ -148,7 +148,7 @@ class TabCardState extends State<TabCard> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(15.0),
       child: ListView.builder(
         itemCount: listOfItem3.length,
         itemBuilder: (context, index) {

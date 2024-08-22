@@ -44,37 +44,37 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyD7IwVqn3EWPtPH8wDawINgEOMFXNl-2eA',
-    appId: '1:359727259191:web:89c31cea114ed4421529b2',
-    messagingSenderId: '359727259191',
-    projectId: 'push-notification-53d36',
-    authDomain: 'push-notification-53d36.firebaseapp.com',
-    storageBucket: 'push-notification-53d36.appspot.com',
+    apiKey: 'AIzaSyAQcu9NOUqf4D1p3WtuX5vyklMFUyI7_bQ',
+    appId: '1:563138394872:web:4680cfc12a90da11e8990d',
+    messagingSenderId: '563138394872',
+    projectId: 'push-notification-b443f',
+    authDomain: 'push-notification-b443f.firebaseapp.com',
+    storageBucket: 'push-notification-b443f.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAiPEXPTlj7xMawTfibfyjU7diqsBYBAzE',
-    appId: '1:359727259191:android:997ddfb9ff582d431529b2',
-    messagingSenderId: '359727259191',
-    projectId: 'push-notification-53d36',
-    storageBucket: 'push-notification-53d36.appspot.com',
+    apiKey: 'AIzaSyAvqHyb2WHQaDtCbc_dunrfAVemasi9AZY',
+    appId: '1:563138394872:android:3f991a4186b60fd2e8990d',
+    messagingSenderId: '563138394872',
+    projectId: 'push-notification-b443f',
+    storageBucket: 'push-notification-b443f.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBX9ibfrzmbIEig9fkgXuziWsFpWvPHRYo',
-    appId: '1:359727259191:ios:d3cdbbeb5690724d1529b2',
-    messagingSenderId: '359727259191',
-    projectId: 'push-notification-53d36',
-    storageBucket: 'push-notification-53d36.appspot.com',
+    apiKey: 'AIzaSyCzPOj7fnUnQuGCMzqO2GfvBXCNly2Jpm4',
+    appId: '1:563138394872:ios:01b9b57f317390a4e8990d',
+    messagingSenderId: '563138394872',
+    projectId: 'push-notification-b443f',
+    storageBucket: 'push-notification-b443f.appspot.com',
     iosBundleId: 'com.example.pushtrial',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyD7IwVqn3EWPtPH8wDawINgEOMFXNl-2eA',
-    appId: '1:359727259191:web:8dc2515c7258132d1529b2',
-    messagingSenderId: '359727259191',
-    projectId: 'push-notification-53d36',
-    authDomain: 'push-notification-53d36.firebaseapp.com',
-    storageBucket: 'push-notification-53d36.appspot.com',
+    apiKey: 'AIzaSyAQcu9NOUqf4D1p3WtuX5vyklMFUyI7_bQ',
+    appId: '1:563138394872:web:5b25487bf6a7ea3be8990d',
+    messagingSenderId: '563138394872',
+    projectId: 'push-notification-b443f',
+    authDomain: 'push-notification-b443f.firebaseapp.com',
+    storageBucket: 'push-notification-b443f.appspot.com',
   );
 }

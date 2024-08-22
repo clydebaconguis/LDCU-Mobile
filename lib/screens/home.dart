@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen>
           _notificationCount = data.where((tap) => tap.pushstatus == 2).length;
         });
 
-        print('Retrieved tap history: $data');
+        // print('Retrieved tap history: $data');
       } else {
         print(
             'Failed to load tap history. Status code: ${response.statusCode}');
@@ -429,8 +429,8 @@ class _HomeScreenState extends State<HomeScreen>
                             child: Column(
                               children: [
                                 Expanded(child: Container()),
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 20.0),
+                                const Center(
+                                  // padding: EdgeInsets.only(bottom: 5.0),
                                   child: ActionButtons(),
                                 ),
                                 const Padding(
