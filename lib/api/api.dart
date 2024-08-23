@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CallApi {
   // final String _mainDomain = "https://app-ldcu.essentiel.ph/";
   // final String _mainDomain = "http://127.0.0.1:8000/";
-  final String _mainDomain = "http://192.168.50.13:8000/";
-  final String _onlineDomain = "http://192.168.50.13:8000/";
+  // final String _mainDomain = "http://192.168.50.13:8000/";
+  final String _mainDomain = "https://assure.essentiel.ph/";
   final String _esDomain = "api/mobile/api_login";
   final String _enrollmentInfo = "api/mobile/api_enrollmentinfo";
   final String _enrollmentData = "api/mobile/api_enrollmentdata";
@@ -174,7 +174,7 @@ class CallApi {
   // }
 
   login(username, pword) async {
-    var fullUrl = '$_onlineDomain$_esDomain?&username=$username&pword=$pword';
+    var fullUrl = '$_mainDomain$_esDomain?&username=$username&pword=$pword';
     return await http.get(Uri.parse(fullUrl));
   }
 

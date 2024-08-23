@@ -114,7 +114,7 @@ class BillingInformationState extends State<BillingInformationPage> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
-                                        fontSize: 13,
+                                        fontSize: 11,
                                       ))),
                               DataColumn(
                                   label: Text('Amount',

@@ -59,7 +59,7 @@ class PaymentPageState extends State<PaymentPage> {
         setState(() {
           trans = list.map((model) => Transactions.fromJson(model)).toList();
         });
-        print('Retrieved transactions: $trans');
+        // print('Retrieved transactions: $trans');
       } catch (e) {
         print('Error parsing JSON: $e');
       }

@@ -357,7 +357,6 @@ import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/taphistory.dart';
-import 'package:pushtrial/models/fcmtoken.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:async';

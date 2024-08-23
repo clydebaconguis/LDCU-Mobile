@@ -59,7 +59,7 @@ class ActionButtonsState extends State<ActionButtons> {
           children: [
             ActionButton(
               icon: Icons.calendar_month,
-              label: 'Class Schedule',
+              label: 'Class\nSchedule',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -70,7 +70,7 @@ class ActionButtonsState extends State<ActionButtons> {
             ),
             ActionButton(
               icon: Icons.folder_open,
-              label: 'Report Card',
+              label: 'Report\nCard',
               onPressed: () {
                 EnrollmentInfo? latestInfo = getSelectedEnrollmentInfo();
                 if (latestInfo != null) {
@@ -91,7 +91,7 @@ class ActionButtonsState extends State<ActionButtons> {
             ),
             ActionButton(
               icon: Icons.folder_open,
-              label: 'Remedial Class',
+              label: 'Remedial\nClass',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -102,7 +102,7 @@ class ActionButtonsState extends State<ActionButtons> {
             ),
             ActionButton(
               icon: Icons.receipt_long,
-              label: 'Billing Information',
+              label: 'Billing\nInformation',
               onPressed: () {
                 Navigator.push(
                   context,

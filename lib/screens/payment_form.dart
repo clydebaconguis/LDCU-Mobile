@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class PaymentForm extends StatefulWidget {
   @override
@@ -7,6 +10,18 @@ class PaymentForm extends StatefulWidget {
 
 class _PaymentFormState extends State<PaymentForm> {
   String _selectedPaymentType = 'bank';
+  File? _receiptImage;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _receiptImage = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +36,7 @@ class _PaymentFormState extends State<PaymentForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DropdownButtonFormField<String>(
+              DropdownButtonFormField2<String>(
                 value: _selectedPaymentType,
                 items: [
                   DropdownMenuItem(child: Text('Bank'), value: 'bank'),
@@ -42,6 +57,13 @@ class _PaymentFormState extends State<PaymentForm> {
                   ),
                   prefixIcon: Icon(Icons.payments),
                   border: OutlineInputBorder(),
+                ),
+                buttonStyleData: const ButtonStyleData(
+                  height: 40,
+                  padding: EdgeInsets.only(left: 14, right: 14),
+                ),
+                dropdownStyleData: const DropdownStyleData(
+                  maxHeight: 200,
                 ),
               ),
               SizedBox(height: 12),
@@ -73,16 +95,29 @@ class _PaymentFormState extends State<PaymentForm> {
                 ),
                 const SizedBox(height: 12),
               ],
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Receipt Image',
-                  labelStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+              GestureDetector(
+                onTap: _pickImage,
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Receipt Image',
+                      labelStyle: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      prefixIcon: const Icon(Icons.image, color: Colors.grey),
+                      border: const OutlineInputBorder(),
+                      suffixIcon: _receiptImage != null
+                          ? Image.file(
+                              _receiptImage!,
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
                   ),
-                  prefixIcon: Icon(Icons.image, color: Colors.grey),
-                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
@@ -94,10 +129,7 @@ class _PaymentFormState extends State<PaymentForm> {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
-                  prefixIcon: Icon(
-                    Icons.numbers,
-                    color: Colors.grey,
-                  ),
+                  prefixIcon: Icon(Icons.numbers, color: Colors.grey),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -110,10 +142,7 @@ class _PaymentFormState extends State<PaymentForm> {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
-                  prefixIcon: Icon(
-                    Icons.money,
-                    color: Colors.grey,
-                  ),
+                  prefixIcon: Icon(Icons.money, color: Colors.grey),
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
@@ -127,10 +156,7 @@ class _PaymentFormState extends State<PaymentForm> {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
-                  prefixIcon: Icon(
-                    Icons.message,
-                    color: Colors.grey,
-                  ),
+                  prefixIcon: Icon(Icons.message, color: Colors.grey),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -143,10 +169,7 @@ class _PaymentFormState extends State<PaymentForm> {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
-                  prefixIcon: Icon(
-                    Icons.phone,
-                    color: Colors.grey,
-                  ),
+                  prefixIcon: Icon(Icons.phone, color: Colors.grey),
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pushtrial/push_notifications.dart';
+// import 'package:pushtrial/push_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import 'dart:convert';
@@ -82,27 +82,27 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Future<void> _showFCMTokenDialog() async {
-    String? token = await PushNotifications.getFCMToken();
+  // Future<void> _showFCMTokenDialog() async {
+  //   String? token = await PushNotifications.getFCMToken();
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('FCM Token'),
-          content: Text(token ?? 'Failed to retrieve FCM token'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('FCM Token'),
+  //         content: Text(token ?? 'Failed to retrieve FCM token'),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //             child: Text('OK'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -174,11 +174,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 },
               ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showFCMTokenDialog,
-        child: Icon(Icons.info),
-        backgroundColor: Colors.blue,
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _showFCMTokenDialog,
+      //   child: Icon(Icons.info),
+      //   backgroundColor: Colors.blue,
+      // ),
     );
   }
 }
