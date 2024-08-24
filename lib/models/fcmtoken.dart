@@ -1,28 +1,28 @@
-class FCMToken {
-  final int studid;
-  final String fcmtoken;
+// class FCMToken {
+//   final int studid;
+//   final String fcmtoken;
 
-  FCMToken({
-    required this.studid,
-    required this.fcmtoken,
-  });
+//   FCMToken({
+//     required this.studid,
+//     required this.fcmtoken,
+//   });
 
-  factory FCMToken.fromJson(Map<String, dynamic> json) {
-    return FCMToken(
-      studid: json['studid'],
-      fcmtoken: json['fcmtoken'],
-    );
-  }
+//   factory FCMToken.fromJson(Map<String, dynamic> json) {
+//     return FCMToken(
+//       studid: json['studid'],
+//       fcmtoken: json['fcmtoken'],
+//     );
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'studid': studid,
-      'fcmtoken': fcmtoken,
-    };
-  }
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'studid': studid,
+//       'fcmtoken': fcmtoken,
+//     };
+//   }
 
-  @override
-  String toString() {
-    return 'FCMToken(studid: $studid, fcmtoken: $fcmtoken)';
-  }
-}
+//   @override
+//   String toString() {
+//     return 'FCMToken(studid: $studid, fcmtoken: $fcmtoken)';
+//   }
+// }

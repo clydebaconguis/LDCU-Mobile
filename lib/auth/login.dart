@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import '../models/user.dart';
+import 'package:pushtrial/push_notifications.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -42,6 +43,11 @@ class _LoginState extends State<Login> {
               await prefs.setString('user', jsonEncode(user.toJson()));
               await prefs.setString(
                   'studid', responseData['stud']['id'].toString());
+
+              // String? token = await PushNotifications.getFCMToken();
+              // if (token != null) {
+              //   await _callApi.getSaveToken(user.id, token);
+              // }
 
               Navigator.pushReplacementNamed(context, '/home', arguments: user);
             } else {

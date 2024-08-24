@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CallApi {
   // final String _mainDomain = "https://app-ldcu.essentiel.ph/";
   // final String _mainDomain = "http://127.0.0.1:8000/";
-  // final String _mainDomain = "http://192.168.50.13:8000/";
-  final String _mainDomain = "https://assure.essentiel.ph/";
+  final String _mainDomain = "http://192.168.50.13:8000/";
+  // final String _mainDomain = "https://assure.essentiel.ph/";
   final String _esDomain = "api/mobile/api_login";
   final String _enrollmentInfo = "api/mobile/api_enrollmentinfo";
   final String _enrollmentData = "api/mobile/api_enrollmentdata";
@@ -23,6 +23,9 @@ class CallApi {
   final String _updatePushStatus = "api/mobile/api_update_pushstatus";
   final String _transactions = "api/mobile/api_get_transactions";
   final String _saveToken = "api/mobile/api_save_fcmtoken";
+  final String _deleteToken = "api/mobile/deleteFcmToken";
+  final String _onlinePayments = "api/mobile/api_get_onlinepaymentoptions";
+  final String _sendPayment = "api/mobile/api_send_payment";
 
   getSchoolInfo() async {
     var fullUrl = '$_mainDomain$_schoolinfo';
@@ -37,6 +40,29 @@ class CallApi {
   //     Uri.parse(fullUrl),
   //   );
   // }
+
+  getSendPayment(studid, paymentType, amount, transDate, refNum, opcontact,
+      syid, semid) async {
+    var fullUrl =
+        '$_mainDomain$_sendPayment?studid=$studid&paymentType=$paymentType&amount=$amount&transDate=$transDate&refNum=$refNum&opcontact=$opcontact&syid=$syid&semid=$semid';
+    return await http.post(
+      Uri.parse(fullUrl),
+    );
+  }
+
+  getOnlinePayments(id) async {
+    var fullUrl = '$_mainDomain$_onlinePayments?id=$id';
+    return await http.get(
+      Uri.parse(fullUrl),
+    );
+  }
+
+  getDeleteToken(studid, fcmtoken) async {
+    var fullUrl = '$_mainDomain$_deleteToken?studid=$studid&fcmtoken=$fcmtoken';
+    return await http.post(
+      Uri.parse(fullUrl),
+    );
+  }
 
   getSaveToken(int studid, String fcmtoken) async {
     var fullUrl = '$_mainDomain$_saveToken?studid=$studid&fcmtoken=$fcmtoken';

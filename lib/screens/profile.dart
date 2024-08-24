@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:pushtrial/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User user;
@@ -19,6 +20,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   User user = UserData.myUser;
   String id = '0';
   String selectedYear = '';
@@ -423,6 +425,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user');
+    if (userJson != null) {
+      final user = User.fromJson(jsonDecode(userJson));
+      final studid = user.id;
+
+      final fcmtoken = await _firebaseMessaging.getToken();
+
+      try {
+        final response = await CallApi().getDeleteToken(
+          studid,
+          fcmtoken,
+        );
+
+        if (response.statusCode == 200) {
+          print('FCM Token deleted successfully');
+        } else {
+          print('Failed to delete FCM Token');
+        }
+      } catch (e) {
+        print('Exception occurred while deleting FCM token: $e');
+      }
+    }
+
     await prefs.remove('user');
 
     ScaffoldMessenger.of(context).showSnackBar(

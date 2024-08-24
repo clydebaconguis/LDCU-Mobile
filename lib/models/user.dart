@@ -1,5 +1,5 @@
 class User {
-  int? id;
+  int id;
   int sectionid;
   int userid;
   String? lrn;
@@ -34,7 +34,7 @@ class User {
   int isguardiannum;
 
   User({
-    this.id,
+    this.id = 0,
     this.sectionid = 0,
     this.userid = 0,
     this.lrn,

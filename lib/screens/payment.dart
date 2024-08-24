@@ -32,8 +32,6 @@ class PaymentPageState extends State<PaymentPage> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final json = preferences.getString('studid');
 
-    print(json);
-
     if (json != null) {
       setState(() {
         id = json;
