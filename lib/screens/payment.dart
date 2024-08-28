@@ -166,6 +166,11 @@ class PaymentPageState extends State<PaymentPage> {
   Widget _buildUploadedPaymentTab() {
     final dateFormat = DateFormat('MMMM d, yyyy');
     final amountFormat = NumberFormat('#,##0.00', 'en_US');
+
+    // Sort payments by date in descending order
+    payments.sort((a, b) =>
+        DateTime.parse(b.paymentDate).compareTo(DateTime.parse(a.paymentDate)));
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: ListView.builder(
@@ -225,7 +230,6 @@ class PaymentPageState extends State<PaymentPage> {
                       ),
                     ],
                   ),
-                  // const SizedBox(height: 8.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

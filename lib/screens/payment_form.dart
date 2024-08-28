@@ -208,8 +208,13 @@ class _PaymentFormState extends State<PaymentForm> {
           .id
           .toString();
 
-      var request = http.MultipartRequest('POST',
-          Uri.parse('http://192.168.50.13:8000/api/mobile/api_send_payment/'));
+      // var request = http.MultipartRequest('POST',
+      //     Uri.parse('http://192.168.50.13:8000/api/mobile/api_send_payment/'));
+
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+              'https://assure.essentiel.ph/api/mobile/api_send_payment/'));
 
       request.fields['studid'] = id.toString();
       request.fields['paymentType'] = paymentType!;
@@ -254,11 +259,21 @@ class _PaymentFormState extends State<PaymentForm> {
           print('Unexpected response format: $responseString');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  'Payment was successful, but an unexpected response was received.'),
-              backgroundColor: Colors.orange,
+              content: Text('Payment submitted successfully!'),
+              backgroundColor: Colors.green,
             ),
           );
+
+          _transactionDateController.clear();
+          _referenceNumberController.clear();
+          _paymentAmountController.clear();
+          _messageReceiverController.clear();
+          _contactNumberController.clear();
+          _receiptImageFile = null;
+          _receiptImageBytes = null;
+          setState(() {
+            _selectedPaymentType = null;
+          });
         }
       } else {
         final responseString = await response.stream.bytesToString();
