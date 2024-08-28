@@ -181,7 +181,7 @@ class _PaymentFormState extends State<PaymentForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please fill in all required fields.'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color.fromARGB(255, 133, 13, 22),
         ),
       );
       return;
@@ -217,7 +217,7 @@ class _PaymentFormState extends State<PaymentForm> {
               'https://assure.essentiel.ph/api/mobile/api_send_payment/'));
 
       request.fields['studid'] = id.toString();
-      request.fields['paymentType'] = paymentType!;
+      request.fields['paymentType'] = paymentType;
       request.fields['amount'] = amount;
       request.fields['transDate'] = transDate;
       request.fields['refNum'] = refNum;
@@ -238,23 +238,32 @@ class _PaymentFormState extends State<PaymentForm> {
         if (responseString.trim().startsWith('{')) {
           var responseData = json.decode(responseString);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Payment submitted successfully!'),
-              backgroundColor: const Color.fromARGB(255, 73, 136, 75),
-            ),
-          );
-
-          _transactionDateController.clear();
-          _referenceNumberController.clear();
-          _paymentAmountController.clear();
-          _messageReceiverController.clear();
-          _contactNumberController.clear();
-          _receiptImageFile = null;
-          _receiptImageBytes = null;
-          setState(() {
-            _selectedPaymentType = null;
-          });
+          if (responseData['status'] == 0 &&
+              responseData['message'] == 'Reference Number already exists') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Reference Number already exists.'),
+                backgroundColor: Color.fromARGB(255, 133, 13, 22),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Payment submitted successfully!'),
+                backgroundColor: const Color.fromARGB(255, 73, 136, 75),
+              ),
+            );
+            _transactionDateController.clear();
+            _referenceNumberController.clear();
+            _paymentAmountController.clear();
+            _messageReceiverController.clear();
+            _contactNumberController.clear();
+            _receiptImageFile = null;
+            _receiptImageBytes = null;
+            setState(() {
+              _selectedPaymentType = null;
+            });
+          }
         } else {
           print('Unexpected response format: $responseString');
           ScaffoldMessenger.of(context).showSnackBar(
@@ -281,7 +290,7 @@ class _PaymentFormState extends State<PaymentForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to submit payment: $responseString'),
-            backgroundColor: Colors.red,
+            backgroundColor: Color.fromARGB(255, 133, 13, 22),
           ),
         );
       }
@@ -290,7 +299,7 @@ class _PaymentFormState extends State<PaymentForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('An error occurred. Please try again later.'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color.fromARGB(255, 133, 13, 22),
         ),
       );
     } finally {
@@ -399,16 +408,17 @@ class _PaymentFormState extends State<PaymentForm> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 109, 17, 10),
+                color: const Color.fromARGB(255, 133, 13, 22),
                 size: 100,
               ),
             )
           : Padding(
-              padding: const EdgeInsets.all(30),
+              padding: const EdgeInsets.only(left: 30, right: 30),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -429,7 +439,7 @@ class _PaymentFormState extends State<PaymentForm> {
                               });
                             },
                             decoration: const InputDecoration(
-                              labelText: 'Enrollment',
+                              labelText: 'School Year',
                               labelStyle: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 12,
@@ -646,7 +656,7 @@ class _PaymentFormState extends State<PaymentForm> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
                     if (_receiptImageBytes != null)
                       Image.memory(
                         _receiptImageBytes!,
@@ -656,17 +666,20 @@ class _PaymentFormState extends State<PaymentForm> {
                       ),
                     const SizedBox(height: 12),
                     Center(
-                      child: ElevatedButton(
-                        onPressed: _submitForm,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 109, 17, 10),
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text(
-                          'Submit Payment',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _submitForm,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(255, 133, 13, 22),
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text(
+                            'Submit Payment',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                            ),
                           ),
                         ),
                       ),

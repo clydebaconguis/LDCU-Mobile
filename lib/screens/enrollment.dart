@@ -58,7 +58,7 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 109, 17, 10),
+                color: const Color.fromARGB(255, 133, 13, 22),
                 size: 100,
               ),
             )
@@ -69,7 +69,7 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
                   maxHeight: 250,
                 ),
                 child: Card(
-                  color: const Color.fromARGB(255, 109, 17, 10),
+                  color: const Color.fromARGB(255, 133, 13, 22),
                   elevation: 4.0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),

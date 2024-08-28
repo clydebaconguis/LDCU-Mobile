@@ -9,6 +9,7 @@ import 'package:pushtrial/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User user;
@@ -29,6 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String sem = '';
   String host = CallApi().getImage();
   bool isValid = false;
+  bool loading = true;
 
   @override
   void initState() {
@@ -49,161 +51,170 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text('Profile', style: TextStyle(fontFamily: 'Poppins')),
       ),
-      body: Column(
-        children: [
-          _buildProfileHeader(),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(30.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildSectionHeader('Enrollment Information'),
-                    _buildInfoRow(
-                      'Grade Level:',
-                      _getGradeLevel(),
-                      icon: Icons.grade,
-                    ),
-                    if (_getStrand().isNotEmpty)
-                      _buildInfoRow(
-                        'Strand:',
-                        _getStrand(),
-                        icon: Icons.school,
-                      ),
-                    if (_getCourse().isNotEmpty)
-                      _buildInfoRow(
-                        'Course:',
-                        _getCourse(),
-                        icon: Icons.school,
-                      ),
-                    if (widget.user.lrn != null && widget.user.lrn!.isNotEmpty)
-                      _buildInfoRow(
-                        'LRN:',
-                        widget.user.lrn ?? '',
-                        icon: Icons.confirmation_number,
-                      ),
-                    const SizedBox(height: 32),
-                    _buildSectionHeader('Personal Information'),
-                    _buildInfoRow(
-                      'First Name:',
-                      widget.user.firstname ?? '',
-                      icon: Icons.badge,
-                    ),
-                    _buildInfoRow(
-                      'Middle Name:',
-                      widget.user.middlename ?? '',
-                      icon: Icons.badge,
-                    ),
-                    _buildInfoRow(
-                      'Last Name:',
-                      widget.user.lastname ?? '',
-                      icon: Icons.badge,
-                    ),
-                    _buildInfoRow(
-                      'Suffix:',
-                      widget.user.suffix,
-                      icon: Icons.badge,
-                    ),
-                    _buildInfoRow(
-                      'Student ID:',
-                      widget.user.sid ?? '',
-                      icon: Icons.tag,
-                    ),
-                    _buildInfoRow(
-                      'Date of Birth:',
-                      widget.user.dob ?? '',
-                      icon: Icons.calendar_month,
-                    ),
-                    _buildInfoRow(
-                      'Gender:',
-                      widget.user.gender ?? '',
-                      icon: Icons.man,
-                    ),
-                    // _buildInfoRow(
-                    //   'Nationality:',
-                    //   '${widget.user.nationality ?? ''}',
-                    //   icon: Icons.map,
-                    // ),
-                    _buildInfoRow(
-                      'Mobile Number:',
-                      widget.user.contactno ?? '',
-                      icon: Icons.phone_iphone,
-                    ),
-                    _buildInfoRow(
-                      'Email Address:',
-                      widget.user.semail ?? '',
-                      icon: Icons.mail,
-                    ),
-                    const SizedBox(height: 32),
-                    _buildSectionHeader('Parent/Guardian Information'),
-                    _buildInfoRow(
-                      'Father\'s Full Name:',
-                      widget.user.fathername ?? '',
-                      icon: Icons.badge,
-                    ),
-                    _buildInfoRow(
-                      'Father\'s Occupation:',
-                      widget.user.foccupation ?? '',
-                      icon: Icons.work,
-                    ),
-                    _buildInfoRow(
-                      'Father\'s Contact Number:',
-                      widget.user.fcontactno ?? '',
-                      icon: Icons.phone_iphone,
-                    ),
-                    _buildInfoRow(
-                      'Mother\'s Full Maiden Name:',
-                      widget.user.mothername ?? '',
-                      icon: Icons.badge,
-                    ),
-                    _buildInfoRow(
-                      'Mother\'s Occupation:',
-                      widget.user.moccupation ?? '',
-                      icon: Icons.work,
-                    ),
-                    _buildInfoRow(
-                      'Mother\'s Contact Number:',
-                      widget.user.mcontactno ?? '',
-                      icon: Icons.phone_iphone,
-                    ),
-                    _buildInfoRow(
-                      'Guardian\'s Full Name:',
-                      widget.user.guardianname ?? '',
-                      icon: Icons.badge,
-                    ),
-                    _buildInfoRow(
-                      'Guardian\'s Relationship:',
-                      widget.user.guardianrelation ?? '',
-                      icon: Icons.supervised_user_circle,
-                    ),
-                    _buildInfoRow(
-                      'Guardian\'s Contact Number:',
-                      widget.user.gcontactno ?? '',
-                      icon: Icons.phone_iphone,
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: () => _logout(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 109, 17, 10),
-                      ),
-                      child: const Text(
-                        'Logout',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+      body: loading
+          ? Center(
+              child: LoadingAnimationWidget.prograssiveDots(
+                color: const Color.fromARGB(255, 133, 13, 22),
+                size: 100,
               ),
+            )
+          : Column(
+              children: [
+                _buildProfileHeader(),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildSectionHeader('Enrollment Information'),
+                          _buildInfoRow(
+                            'Grade Level:',
+                            _getGradeLevel(),
+                            icon: Icons.grade,
+                          ),
+                          if (_getStrand().isNotEmpty)
+                            _buildInfoRow(
+                              'Strand:',
+                              _getStrand(),
+                              icon: Icons.school,
+                            ),
+                          if (_getCourse().isNotEmpty)
+                            _buildInfoRow(
+                              'Course:',
+                              _getCourse(),
+                              icon: Icons.school,
+                            ),
+                          if (widget.user.lrn != null &&
+                              widget.user.lrn!.isNotEmpty)
+                            _buildInfoRow(
+                              'LRN:',
+                              widget.user.lrn ?? '',
+                              icon: Icons.confirmation_number,
+                            ),
+                          const SizedBox(height: 32),
+                          _buildSectionHeader('Personal Information'),
+                          _buildInfoRow(
+                            'First Name:',
+                            widget.user.firstname ?? '',
+                            icon: Icons.badge,
+                          ),
+                          _buildInfoRow(
+                            'Middle Name:',
+                            widget.user.middlename ?? '',
+                            icon: Icons.badge,
+                          ),
+                          _buildInfoRow(
+                            'Last Name:',
+                            widget.user.lastname ?? '',
+                            icon: Icons.badge,
+                          ),
+                          _buildInfoRow(
+                            'Suffix:',
+                            widget.user.suffix,
+                            icon: Icons.badge,
+                          ),
+                          _buildInfoRow(
+                            'Student ID:',
+                            widget.user.sid ?? '',
+                            icon: Icons.tag,
+                          ),
+                          _buildInfoRow(
+                            'Date of Birth:',
+                            widget.user.dob ?? '',
+                            icon: Icons.calendar_month,
+                          ),
+                          _buildInfoRow(
+                            'Gender:',
+                            widget.user.gender ?? '',
+                            icon: Icons.man,
+                          ),
+                          // _buildInfoRow(
+                          //   'Nationality:',
+                          //   '${widget.user.nationality ?? ''}',
+                          //   icon: Icons.map,
+                          // ),
+                          _buildInfoRow(
+                            'Mobile Number:',
+                            widget.user.contactno ?? '',
+                            icon: Icons.phone_iphone,
+                          ),
+                          _buildInfoRow(
+                            'Email Address:',
+                            widget.user.semail ?? '',
+                            icon: Icons.mail,
+                          ),
+                          const SizedBox(height: 32),
+                          _buildSectionHeader('Parent/Guardian Information'),
+                          _buildInfoRow(
+                            'Father\'s Full Name:',
+                            widget.user.fathername ?? '',
+                            icon: Icons.badge,
+                          ),
+                          _buildInfoRow(
+                            'Father\'s Occupation:',
+                            widget.user.foccupation ?? '',
+                            icon: Icons.work,
+                          ),
+                          _buildInfoRow(
+                            'Father\'s Contact Number:',
+                            widget.user.fcontactno ?? '',
+                            icon: Icons.phone_iphone,
+                          ),
+                          _buildInfoRow(
+                            'Mother\'s Full Maiden Name:',
+                            widget.user.mothername ?? '',
+                            icon: Icons.badge,
+                          ),
+                          _buildInfoRow(
+                            'Mother\'s Occupation:',
+                            widget.user.moccupation ?? '',
+                            icon: Icons.work,
+                          ),
+                          _buildInfoRow(
+                            'Mother\'s Contact Number:',
+                            widget.user.mcontactno ?? '',
+                            icon: Icons.phone_iphone,
+                          ),
+                          _buildInfoRow(
+                            'Guardian\'s Full Name:',
+                            widget.user.guardianname ?? '',
+                            icon: Icons.badge,
+                          ),
+                          _buildInfoRow(
+                            'Guardian\'s Relationship:',
+                            widget.user.guardianrelation ?? '',
+                            icon: Icons.supervised_user_circle,
+                          ),
+                          _buildInfoRow(
+                            'Guardian\'s Contact Number:',
+                            widget.user.gcontactno ?? '',
+                            icon: Icons.phone_iphone,
+                          ),
+                          const SizedBox(height: 32),
+                          ElevatedButton(
+                            onPressed: () => _logout(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 133, 13, 22),
+                            ),
+                            child: const Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -329,10 +340,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (json != null) {
       setState(() {
         id = json;
+        loading = true;
       });
       await getEnrollment();
     }
-    setState(() {});
+    setState(() {
+      loading = false;
+    });
   }
 
   Future<void> getEnrollment() async {

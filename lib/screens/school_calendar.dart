@@ -129,7 +129,7 @@ class _SchoolCalendarState extends State<SchoolCalendar> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 109, 17, 10),
+                color: const Color.fromARGB(255, 133, 13, 22),
                 size: 100,
               ),
             )
@@ -138,17 +138,14 @@ class _SchoolCalendarState extends State<SchoolCalendar> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Select School Year',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                  SizedBox(height: 10.0),
                   DropdownButtonFormField2<String>(
                     decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey[200],
+                      labelText: 'School Year',
+                      labelStyle: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(color: Colors.grey, width: 1),
@@ -227,7 +224,7 @@ class _SchoolCalendarState extends State<SchoolCalendar> {
                               //     DateFormat('MMMM d, yyyy')
                               //         .format(event.endTime);
                               return Card(
-                                color: const Color.fromARGB(255, 109, 17, 10),
+                                color: const Color.fromARGB(255, 133, 13, 22),
                                 margin: EdgeInsets.symmetric(vertical: 8.0),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),

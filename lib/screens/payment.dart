@@ -88,7 +88,7 @@ class PaymentPageState extends State<PaymentPage> {
       });
 
       payments.forEach((payment) {
-        print('Payment ID: ${payment.id}, Status: ${payment.getStatus()}');
+        // print('Payment ID: ${payment.id}, Status: ${payment.getStatus()}');
       });
     }
   }
@@ -114,18 +114,19 @@ class PaymentPageState extends State<PaymentPage> {
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Color.fromARGB(255, 109, 17, 10),
+                    color: Color.fromARGB(255, 133, 13, 22),
                   ),
                   child: TabBar(
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: BoxDecoration(
-                      color: const Color.fromARGB(255, 219, 154, 149),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelColor: Colors.black,
                     unselectedLabelColor: Colors.white,
+                    labelStyle: TextStyle(fontSize: 12),
                     tabs: const [
-                      Tab(text: 'Online Payment'),
+                      Tab(text: 'Uploaded Payment'),
                       Tab(text: 'Transactions'),
                     ],
                   ),
@@ -141,9 +142,9 @@ class PaymentPageState extends State<PaymentPage> {
           ),
           floatingActionButton: ClipOval(
             child: Material(
-              color: const Color.fromARGB(255, 109, 17, 10),
+              color: const Color.fromARGB(255, 133, 13, 22),
               child: InkWell(
-                splashColor: const Color.fromARGB(255, 109, 17, 10),
+                splashColor: const Color.fromARGB(255, 133, 13, 22),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -182,72 +183,86 @@ class PaymentPageState extends State<PaymentPage> {
           final double amountPaid = double.parse(payment.amount);
           final formattedAmount = amountFormat.format(amountPaid);
 
-          return Card(
-            margin: const EdgeInsets.all(5.0),
-            elevation: 10.0,
-            shape: RoundedRectangleBorder(
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 133, 13, 22),
+                  Color.fromARGB(255, 14, 19, 29),
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
               borderRadius: BorderRadius.circular(15.0),
             ),
-            child: Container(
-              color: const Color.fromARGB(255, 14, 19, 29),
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        payment.description,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                      Text(
-                        'RN: ${payment.refNum}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.red,
+            margin: const EdgeInsets.all(5.0),
+            child: Card(
+              color: Colors.transparent,
+              elevation: 10.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          payment.description,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        formattedDate,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        'Php $formattedAmount',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.green,
+                        Text(
+                          'RN: ${payment.refNum}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: Colors.red,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        '(${payment.getStatus()})',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                          color: Colors.white,
+                      ],
+                    ),
+                    // const SizedBox(height: 8.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          formattedDate,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 12),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        Text(
+                          'Php $formattedAmount',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          '',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          '(${payment.getStatus()})',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -271,13 +286,13 @@ class PaymentPageState extends State<PaymentPage> {
           final formattedAmount = amountFormat.format(amountPaid);
 
           return Card(
+            color: const Color.fromARGB(255, 14, 19, 29),
             margin: const EdgeInsets.all(5.0),
             elevation: 10.0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Container(
-              color: const Color.fromARGB(255, 14, 19, 29),
               padding: const EdgeInsets.all(15.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,7 +315,7 @@ class PaymentPageState extends State<PaymentPage> {
                         'Php $formattedAmount',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 15,
                           color: Colors.green,
                         ),
                       ),

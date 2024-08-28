@@ -111,19 +111,15 @@ class _AttendanceState extends State<AttendanceScreen> {
       padding: const EdgeInsets.all(5.0),
       child: Column(
         children: [
-          const Text(
-            'School Year',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 16.0,
-            ),
-          ),
-          const SizedBox(height: 10.0),
           selectedYear.isNotEmpty
               ? DropdownButtonFormField2<String>(
                   decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey[200],
+                    labelText: 'School Year',
+                    labelStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide:

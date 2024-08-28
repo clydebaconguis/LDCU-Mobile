@@ -166,7 +166,7 @@ class _ReportCardState extends State<ReportCard> {
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: const Color.fromARGB(255, 109, 17, 10),
+                    color: const Color.fromARGB(255, 133, 13, 22),
                   ),
                   child: TabBar(
                     indicatorSize: TabBarIndicatorSize.tab,
@@ -176,6 +176,7 @@ class _ReportCardState extends State<ReportCard> {
                     ),
                     labelColor: Colors.black,
                     unselectedLabelColor: Colors.white,
+                    labelStyle: TextStyle(fontSize: 12),
                     tabs: [
                       Tab(text: 'Grades'),
                       Tab(text: 'Attendance'),
@@ -195,7 +196,7 @@ class _ReportCardState extends State<ReportCard> {
           ),
           floatingActionButton: ClipOval(
             child: Material(
-              color: Color.fromARGB(255, 109, 17, 10),
+              color: Color.fromARGB(255, 133, 13, 22),
               child: InkWell(
                 splashColor: Colors.red,
                 onTap: () {},
@@ -216,19 +217,15 @@ class _ReportCardState extends State<ReportCard> {
     return ListView(
       padding: const EdgeInsets.all(30),
       children: [
-        Text(
-          'School Year',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 16.0,
-          ),
-        ),
-        SizedBox(height: 10.0),
         selectedYear.isNotEmpty
             ? DropdownButtonFormField2<String>(
                 decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[200],
+                  labelText: 'School Year',
+                  labelStyle: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: Colors.grey, width: 1),
@@ -271,21 +268,17 @@ class _ReportCardState extends State<ReportCard> {
                 ).toList(),
               )
             : const CircularProgressIndicator(),
-        SizedBox(height: 20.0),
         if (gradelevel == 14 || gradelevel == 15 || gradelevel >= 17) ...[
-          Text(
-            'Semester',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 16.0,
-            ),
-          ),
           SizedBox(height: 10.0),
           selectedSem.isNotEmpty
               ? DropdownButtonFormField2<String>(
                   decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey[200],
+                    labelText: 'Semester',
+                    labelStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide(color: Colors.grey, width: 1),

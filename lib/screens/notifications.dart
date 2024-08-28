@@ -40,7 +40,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     print('User data in notifications screen: $user');
 
     setState(() {
-      studid = user.id ?? 0;
+      studid = user.id;
     });
   }
 
@@ -156,7 +156,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       ),
                     ],
                     child: Card(
-                      color: const Color.fromARGB(255, 109, 17, 10),
+                      color: const Color.fromARGB(255, 133, 13, 22),
                       margin: const EdgeInsets.all(10.0),
                       elevation: 5,
                       child: ListTile(

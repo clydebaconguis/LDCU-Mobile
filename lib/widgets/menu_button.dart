@@ -109,7 +109,7 @@ class _CustomFloatingMenuState extends State<CustomFloatingMenu> {
                 _isMenuOpen ? Icons.close : Icons.menu,
                 color: Colors.white,
               ),
-              backgroundColor: Color.fromARGB(255, 109, 17, 10),
+              backgroundColor: Color.fromARGB(255, 133, 13, 22),
               shape: CircleBorder(),
             ),
           ),
@@ -131,7 +131,7 @@ class _CustomFloatingMenuState extends State<CustomFloatingMenu> {
             children: [
               CircleAvatar(
                 radius: 30.0,
-                backgroundColor: Color.fromARGB(255, 109, 17, 10),
+                backgroundColor: const Color.fromARGB(255, 133, 13, 22),
                 child: Icon(
                   iconData[index],
                   color: Colors.white,

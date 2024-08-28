@@ -73,14 +73,14 @@ class TabCardState extends State<TabCard> {
   Widget _buildTab(IconData icon, String title) {
     return Column(
       children: [
-        Icon(icon, color: Color.fromARGB(255, 109, 17, 10)),
+        Icon(icon, color: Color.fromARGB(255, 133, 13, 22)),
         SizedBox(height: 4.0),
         Text(
           title,
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 11,
-            color: Color.fromARGB(255, 109, 17, 10),
+            color: Color.fromARGB(255, 133, 13, 22),
           ),
         ),
       ],
@@ -156,7 +156,7 @@ class TabCardState extends State<TabCard> {
           return Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Card(
-              color: const Color.fromARGB(255, 109, 17, 10),
+              color: const Color.fromARGB(255, 133, 13, 22),
               elevation: 5,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -239,7 +239,7 @@ class TabCardState extends State<TabCard> {
           String formattedDate =
               DateFormat('MMMM d, yyyy').format(event.startTime);
           return Card(
-            color: const Color.fromARGB(255, 109, 17, 10),
+            color: const Color.fromARGB(255, 133, 13, 22),
             margin: EdgeInsets.symmetric(vertical: 8.0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),

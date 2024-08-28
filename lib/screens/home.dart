@@ -213,9 +213,9 @@ class _HomeScreenState extends State<HomeScreen>
     final user = widget.user;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 109, 17, 10),
+      backgroundColor: const Color.fromARGB(255, 133, 13, 22),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 109, 17, 10),
+        backgroundColor: const Color.fromARGB(255, 133, 13, 22),
         leading: IconButton(
           icon: Image.asset('assets/app_icon.png'),
           color: Colors.white,
@@ -469,7 +469,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
                 shape: const CircleBorder(),
-                backgroundColor: const Color.fromARGB(255, 109, 17, 10),
+                backgroundColor: const Color.fromARGB(255, 133, 13, 22),
               ),
             ),
           ),
@@ -536,7 +536,7 @@ class _HomeScreenState extends State<HomeScreen>
                   height: 60.0,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color.fromARGB(255, 109, 17, 10),
+                    color: Color.fromARGB(255, 133, 13, 22),
                   ),
                   child: IconButton(
                     icon: const Icon(
@@ -632,7 +632,7 @@ class _HomeScreenState extends State<HomeScreen>
       children: [
         CircleAvatar(
           radius: 30.0,
-          backgroundColor: const Color.fromARGB(255, 109, 17, 10),
+          backgroundColor: const Color.fromARGB(255, 133, 13, 22),
           child: IconButton(
             icon: Icon(icon),
             color: Colors.white,

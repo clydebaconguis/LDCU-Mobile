@@ -160,7 +160,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 109, 17, 10),
+                color: const Color.fromARGB(255, 133, 13, 22),
                 size: 100,
               ),
             )

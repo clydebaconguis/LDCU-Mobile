@@ -88,7 +88,7 @@ class _CreditCardState extends State<CreditCard> {
             Expanded(
               flex: 1,
               child: Container(
-                color: const Color.fromARGB(255, 109, 17, 10),
+                color: const Color.fromARGB(255, 133, 13, 22),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(

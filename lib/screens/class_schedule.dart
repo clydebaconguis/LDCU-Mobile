@@ -221,7 +221,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 109, 17, 10),
+                color: const Color.fromARGB(255, 133, 13, 22),
                 size: 100,
               ),
             )
@@ -232,25 +232,21 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                 children: [
                   Row(
                     children: [
-                      const Text(
-                        'School Year',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16.0,
-                        ),
-                      ),
-                      const SizedBox(width: 10.0),
                       Expanded(
                         child: Container(
                           height: 50,
                           child: DropdownButtonFormField2<String>(
                             decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: const BorderSide(
                                     color: Colors.grey, width: 1),
+                              ),
+                              labelText: 'School Year',
+                              labelStyle: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             isExpanded: true,
@@ -296,27 +292,23 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20.0),
+                  const SizedBox(height: 10.0),
                   Row(
                     children: [
                       if (levelid == 14 || levelid == 15 || levelid >= 17) ...[
-                        const Text(
-                          'Select Semester',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16.0,
-                          ),
-                        ),
-                        const SizedBox(width: 10.0),
                         Expanded(
                           child: DropdownButtonFormField2<String>(
                             decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: const BorderSide(
                                     color: Colors.grey, width: 1),
+                              ),
+                              labelText: 'Semester',
+                              labelStyle: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             isExpanded: true,
@@ -360,27 +352,22 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 20.0),
+                  const SizedBox(height: 10.0),
                   Row(
                     children: [
-                      const SizedBox(height: 20.0),
-                      const Text(
-                        'Select Day',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16.0,
-                        ),
-                      ),
-                      const SizedBox(width: 10.0),
                       Expanded(
                         child: DropdownButtonFormField2<String>(
                           decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[200],
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(
                                   color: Colors.grey, width: 1),
+                            ),
+                            labelText: 'Select Day',
+                            labelStyle: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           isExpanded: true,
@@ -433,7 +420,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                               children: [
                                 Container(
                                   height: 50,
-                                  color: const Color.fromARGB(255, 109, 17, 10),
+                                  color: const Color.fromARGB(255, 133, 13, 22),
                                   child: Stack(
                                     children: [
                                       Positioned(
