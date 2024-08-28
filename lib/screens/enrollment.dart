@@ -48,12 +48,13 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Enrollment',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-          ),
-        ),
+        title: const Text('ENROLLMENT',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        centerTitle: true,
       ),
       body: loading
           ? Center(

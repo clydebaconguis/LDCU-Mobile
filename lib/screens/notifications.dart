@@ -119,10 +119,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Notifications',
-          style: TextStyle(fontFamily: 'Poppins'),
-        ),
+        title: const Text('NOTIFICATIONS',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(30.0),

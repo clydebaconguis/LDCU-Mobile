@@ -97,7 +97,13 @@ class PaymentPageState extends State<PaymentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment'),
+        title: const Text('PAYMENT',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        centerTitle: true,
       ),
       body: DefaultTabController(
         length: 2,

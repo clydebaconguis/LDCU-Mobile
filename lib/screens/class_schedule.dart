@@ -211,12 +211,13 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Class Schedule',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-          ),
-        ),
+        title: const Text('CLASS SCHEDULE',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        centerTitle: true,
       ),
       body: loading
           ? Center(

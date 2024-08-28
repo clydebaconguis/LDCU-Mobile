@@ -124,7 +124,13 @@ class _SchoolCalendarState extends State<SchoolCalendar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('School Calendar', style: TextStyle(fontFamily: 'Poppins')),
+        title: const Text('SCHOOL CALENDAR',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        centerTitle: true,
       ),
       body: loading
           ? Center(

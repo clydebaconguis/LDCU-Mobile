@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
-class ClearanceScreen extends StatelessWidget {
+class SchoolScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CLEARANCE',
+        title: const Text('SCHOOLS',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,
@@ -19,6 +20,6 @@ class ClearanceScreen extends StatelessWidget {
 
 void main() {
   runApp(MaterialApp(
-    home: ClearanceScreen(),
+    home: SchoolScreen(),
   ));
 }

@@ -402,8 +402,13 @@ class _PaymentFormState extends State<PaymentForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Online Payment Form',
-            style: TextStyle(fontFamily: 'Poppins')),
+        title: const Text('ONLINE PAYMENT FORM',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        centerTitle: true,
       ),
       body: loading
           ? Center(

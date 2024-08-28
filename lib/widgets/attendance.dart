@@ -120,11 +120,7 @@ class _AttendanceState extends State<AttendanceScreen> {
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1),
-                    ),
+                    border: OutlineInputBorder(),
                   ),
                   isExpanded: true,
                   value: selectedYear,
@@ -149,7 +145,7 @@ class _AttendanceState extends State<AttendanceScreen> {
                           year,
                           style: const TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                       );

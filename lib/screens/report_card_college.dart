@@ -150,12 +150,13 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Report Card',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-          ),
-        ),
+        title: const Text('REPORT CARD',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        centerTitle: true,
       ),
       body: loading
           ? Center(

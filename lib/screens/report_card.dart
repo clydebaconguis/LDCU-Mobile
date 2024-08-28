@@ -144,12 +144,13 @@ class _ReportCardState extends State<ReportCard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Report Card',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-          ),
-        ),
+        title: const Text('REPORT CARD',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            )),
+        centerTitle: true,
       ),
       body: DefaultTabController(
         length: 3,
@@ -226,10 +227,7 @@ class _ReportCardState extends State<ReportCard> {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey, width: 1),
-                  ),
+                  border: OutlineInputBorder(),
                 ),
                 isExpanded: true,
                 hint: Text(
@@ -260,7 +258,7 @@ class _ReportCardState extends State<ReportCard> {
                         year,
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 14,
+                          fontSize: 12,
                         ),
                       ),
                     );
