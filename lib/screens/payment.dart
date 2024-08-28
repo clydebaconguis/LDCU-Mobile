@@ -5,6 +5,9 @@ import 'dart:convert';
 import 'package:pushtrial/models/transactions.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:intl/intl.dart';
+import 'package:pushtrial/models/user.dart';
+import 'package:pushtrial/models/user_data.dart';
+import 'package:pushtrial/models/onlinepayments.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -13,9 +16,12 @@ class PaymentPage extends StatefulWidget {
 }
 
 class PaymentPageState extends State<PaymentPage> {
-  String id = '0';
+  User user = UserData.myUser;
+  int id = 0;
+  String sid = '0';
   String amountpaid = '0.00';
   List<Transactions> trans = [];
+  List<Payments> payments = [];
 
   @override
   void initState() {
@@ -26,18 +32,19 @@ class PaymentPageState extends State<PaymentPage> {
   Future<void> _initializeData() async {
     await getUser();
     getTransactions();
+    getOnlinePayments();
   }
 
   Future<void> getUser() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    final json = preferences.getString('studid');
+    final json = preferences.getString('user');
+    user = json == null ? UserData.myUser : User.fromJson(jsonDecode(json));
+    print('User data in payment section screen: $user');
 
-    if (json != null) {
-      setState(() {
-        id = json;
-      });
-    }
-    setState(() {});
+    setState(() {
+      id = user.id;
+      sid = user.sid!;
+    });
   }
 
   getTransactions() async {
@@ -67,11 +74,30 @@ class PaymentPageState extends State<PaymentPage> {
     }
   }
 
+  getOnlinePayments() async {
+    final response = await CallApi().getOnlinePayments(sid);
+
+    if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        print('No data returned');
+        return;
+      }
+      Iterable list = json.decode(response.body);
+      setState(() {
+        payments = list.map((model) => Payments.fromJson(model)).toList();
+      });
+
+      payments.forEach((payment) {
+        print('Payment ID: ${payment.id}, Status: ${payment.getStatus()}');
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment'),
+        title: const Text('Payment'),
       ),
       body: DefaultTabController(
         length: 2,
@@ -86,20 +112,20 @@ class PaymentPageState extends State<PaymentPage> {
                 child: Container(
                   height: 40,
                   margin: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: const Color.fromARGB(255, 109, 17, 10),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Color.fromARGB(255, 109, 17, 10),
                   ),
                   child: TabBar(
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: BoxDecoration(
-                      color: Color.fromARGB(255, 219, 154, 149),
+                      color: const Color.fromARGB(255, 219, 154, 149),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelColor: Colors.black,
                     unselectedLabelColor: Colors.white,
-                    tabs: [
-                      Tab(text: 'Uploaded Payment'),
+                    tabs: const [
+                      Tab(text: 'Online Payment'),
                       Tab(text: 'Transactions'),
                     ],
                   ),
@@ -115,7 +141,7 @@ class PaymentPageState extends State<PaymentPage> {
           ),
           floatingActionButton: ClipOval(
             child: Material(
-              color: Color.fromARGB(255, 109, 17, 10),
+              color: const Color.fromARGB(255, 109, 17, 10),
               child: InkWell(
                 splashColor: const Color.fromARGB(255, 109, 17, 10),
                 onTap: () {
@@ -124,7 +150,7 @@ class PaymentPageState extends State<PaymentPage> {
                     MaterialPageRoute(builder: (context) => PaymentForm()),
                   );
                 },
-                child: SizedBox(
+                child: const SizedBox(
                   width: 56,
                   height: 56,
                   child: Icon(Icons.add, color: Colors.white),
@@ -138,13 +164,96 @@ class PaymentPageState extends State<PaymentPage> {
   }
 
   Widget _buildUploadedPaymentTab() {
-    return Center(
-      child: Text('Uploaded Payment Content', style: TextStyle(fontSize: 18)),
+    final dateFormat = DateFormat('MMMM d, yyyy');
+    final amountFormat = NumberFormat('#,##0.00', 'en_US');
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: ListView.builder(
+        itemCount: payments.length,
+        itemBuilder: (context, index) {
+          final payment = payments[index];
+          final formattedDate =
+              dateFormat.format(DateTime.parse(payment.paymentDate));
+          final double amountPaid = double.parse(payment.amount);
+          final formattedAmount = amountFormat.format(amountPaid);
+
+          return Card(
+            margin: const EdgeInsets.all(5.0),
+            elevation: 10.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Container(
+              color: const Color.fromARGB(255, 14, 19, 29),
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        payment.description,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      Text(
+                        'RN: ${payment.refNum}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        formattedDate,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        'Php $formattedAmount',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // const SizedBox(height: 8.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        '(${payment.getStatus()})',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildTransactionsTab() {
-    final dateFormat = DateFormat('MMMM d, yyyy HH:mm:ss');
+    final dateFormat = DateFormat('MMMM d, yyyy h:mm a');
     final amountFormat = NumberFormat('#,##0.00', 'en_US');
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -180,7 +289,8 @@ class PaymentPageState extends State<PaymentPage> {
                     children: [
                       Text(
                         formattedDate,
-                        style: TextStyle(color: Colors.white),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
                       ),
                       Text(
                         'Php $formattedAmount',

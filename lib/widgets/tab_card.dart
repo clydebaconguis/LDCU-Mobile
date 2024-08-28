@@ -91,7 +91,7 @@ class TabCardState extends State<TabCard> {
     if (enInfoData.isEmpty) {
       return Container(
         child: Text(
-          "Loading...",
+          "Loading...Please check internet connection",
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 15,

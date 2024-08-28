@@ -24,8 +24,10 @@ class CallApi {
   final String _transactions = "api/mobile/api_get_transactions";
   final String _saveToken = "api/mobile/api_save_fcmtoken";
   final String _deleteToken = "api/mobile/deleteFcmToken";
-  final String _onlinePayments = "api/mobile/api_get_onlinepaymentoptions";
+  final String _onlinePaymentsOptions =
+      "api/mobile/api_get_onlinepaymentoptions";
   final String _sendPayment = "api/mobile/api_send_payment";
+  final String _onlinePayments = "api/mobile/api_get_onlinepayments";
 
   getSchoolInfo() async {
     var fullUrl = '$_mainDomain$_schoolinfo';
@@ -41,6 +43,13 @@ class CallApi {
   //   );
   // }
 
+  getOnlinePayments(sid) async {
+    var fullUrl = '$_mainDomain$_onlinePayments?sid=$sid';
+    return await http.get(
+      Uri.parse(fullUrl),
+    );
+  }
+
   getSendPayment(studid, paymentType, amount, transDate, refNum, opcontact,
       syid, semid) async {
     var fullUrl =
@@ -50,8 +59,8 @@ class CallApi {
     );
   }
 
-  getOnlinePayments(id) async {
-    var fullUrl = '$_mainDomain$_onlinePayments?id=$id';
+  getOnlinePaymentsOptions(id) async {
+    var fullUrl = '$_mainDomain$_onlinePaymentsOptions?id=$id';
     return await http.get(
       Uri.parse(fullUrl),
     );
@@ -193,11 +202,6 @@ class CallApi {
   }
 
   postData(data, apiUrl) async {}
-
-  //  login(username, pword) async {
-  //   var fullUrl = '$_mainDomain$_esDomain?&username=$username&pword=$pword';
-  //   return await http.get(Uri.parse(fullUrl));
-  // }
 
   login(username, pword) async {
     var fullUrl = '$_mainDomain$_esDomain?&username=$username&pword=$pword';

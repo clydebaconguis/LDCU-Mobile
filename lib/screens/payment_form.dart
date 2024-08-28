@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+// import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,8 +11,9 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
-import 'package:intl/intl.dart';
-import 'package:date_field/date_field.dart';
+// import 'package:image/image.dart' as img;
+import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
 
 class PaymentForm extends StatefulWidget {
   @override
@@ -29,6 +32,8 @@ class _PaymentFormState extends State<PaymentForm> {
   List<Contact> _contactOptions = [];
   File? _receiptImage;
   int id = 0;
+  Uint8List? _receiptImageBytes;
+  File? _receiptImageFile;
   bool loading = true;
 
   final List<String> _messageReceiverOptions = [
@@ -98,19 +103,8 @@ class _PaymentFormState extends State<PaymentForm> {
     });
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _receiptImage = File(pickedFile.path);
-      });
-    }
-  }
-
   Future<void> getOnlinePayments() async {
-    final response = await CallApi().getOnlinePayments(id);
+    final response = await CallApi().getOnlinePaymentsOptions(id);
     final Map<String, dynamic> responseData = json.decode(response.body);
 
     _paymentOptions = (responseData['onlinepaymentoptions'] as List)
@@ -143,12 +137,242 @@ class _PaymentFormState extends State<PaymentForm> {
 
     setState(() {});
 
-    print('Filtered Payment Options: $_paymentOptions');
-    print('Bank Names: $_bankOptions');
-    print('School Years: $_syOptions');
-    print('Semesters: $_semesterOptions');
-    print('Contacts: $_contactOptions');
+    print('Payment options: $_paymentOptions');
   }
+
+  Future<Uint8List?> pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final imageFile = File(pickedFile.path);
+      return await imageFile.readAsBytes();
+    }
+    return null;
+  }
+
+  Future<void> _handlePickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final imageFile = File(pickedFile.path);
+      final imageBytes = await imageFile.readAsBytes();
+
+      setState(() {
+        _receiptImageBytes = imageBytes;
+        _receiptImageFile = imageFile;
+      });
+
+      print('Image picked successfully.');
+      print('Image bytes length: ${imageBytes.length}');
+    } else {
+      print('No image selected.');
+    }
+  }
+
+  Future<void> _submitForm() async {
+    if (_selectedPaymentType == null ||
+        _transactionDateController.text.isEmpty ||
+        _referenceNumberController.text.isEmpty ||
+        _paymentAmountController.text.isEmpty ||
+        _messageReceiverController.text.isEmpty ||
+        _contactNumberController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in all required fields.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      loading = true;
+    });
+
+    try {
+      String amount = _paymentAmountController.text;
+      String transDate = _transactionDateController.text;
+      String refNum = _referenceNumberController.text;
+      String opcontact = _contactNumberController.text;
+      String syid =
+          _syOptions.firstWhere((sy) => sy.sydesc == _selectedSY).id.toString();
+      String semid = _semesterOptions
+          .firstWhere((sem) => sem.semester == _selectedSem)
+          .id
+          .toString();
+
+      String? paymentType = _paymentOptions
+          .firstWhere((option) => option.description == _selectedPaymentType)
+          .id
+          .toString();
+
+      var request = http.MultipartRequest('POST',
+          Uri.parse('http://192.168.50.13:8000/api/mobile/api_send_payment/'));
+
+      request.fields['studid'] = id.toString();
+      request.fields['paymentType'] = paymentType!;
+      request.fields['amount'] = amount;
+      request.fields['transDate'] = transDate;
+      request.fields['refNum'] = refNum;
+      request.fields['opcontact'] = opcontact;
+      request.fields['syid'] = syid;
+      request.fields['semid'] = semid;
+
+      if (_receiptImageFile != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+            'recieptImage', _receiptImageFile!.path));
+      }
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        String responseString = await response.stream.bytesToString();
+        print('Response: $responseString');
+
+        if (responseString.trim().startsWith('{')) {
+          var responseData = json.decode(responseString);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Payment submitted successfully!'),
+              backgroundColor: const Color.fromARGB(255, 73, 136, 75),
+            ),
+          );
+
+          _transactionDateController.clear();
+          _referenceNumberController.clear();
+          _paymentAmountController.clear();
+          _messageReceiverController.clear();
+          _contactNumberController.clear();
+          _receiptImageFile = null;
+          _receiptImageBytes = null;
+          setState(() {
+            _selectedPaymentType = null;
+          });
+        } else {
+          print('Unexpected response format: $responseString');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Payment was successful, but an unexpected response was received.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      } else {
+        final responseString = await response.stream.bytesToString();
+        print('Failed response: $responseString');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit payment: $responseString'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error submitting payment: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred. Please try again later.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        loading = false;
+        _receiptImageFile = null;
+      });
+    }
+  }
+
+  // Future<void> _submitForm() async {
+  //   if (_selectedPaymentType == null ||
+  //       _transactionDateController.text.isEmpty ||
+  //       _referenceNumberController.text.isEmpty ||
+  //       _paymentAmountController.text.isEmpty ||
+  //       _messageReceiverController.text.isEmpty ||
+  //       _contactNumberController.text.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Please fill in all required fields.'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //     return;
+  //   }
+
+  //   setState(() {
+  //     loading = true;
+  //   });
+
+  //   try {
+  //     String amount = _paymentAmountController.text;
+  //     String transDate = _transactionDateController.text;
+  //     String refNum = _referenceNumberController.text;
+  //     String opcontact = _contactNumberController.text;
+  //     String syid =
+  //         _syOptions.firstWhere((sy) => sy.sydesc == _selectedSY).id.toString();
+  //     String semid = _semesterOptions
+  //         .firstWhere((sem) => sem.semester == _selectedSem)
+  //         .id
+  //         .toString();
+
+  //     String? paymentType = _paymentOptions
+  //         .firstWhere((option) => option.description == _selectedPaymentType)
+  //         .id
+  //         .toString();
+
+  //     var request = http.MultipartRequest('POST',
+  //         Uri.parse('http://192.168.50.13:8000/api/mobile/api_send_payment/'));
+
+  //     request.fields['studid'] = id.toString();
+  //     request.fields['paymentType'] = paymentType!;
+  //     request.fields['amount'] = amount;
+  //     request.fields['transDate'] = transDate;
+  //     request.fields['refNum'] = refNum;
+  //     request.fields['opcontact'] = opcontact;
+  //     request.fields['syid'] = syid;
+  //     request.fields['semid'] = semid;
+
+  //     if (_receiptImageFile != null) {
+  //       request.files.add(await http.MultipartFile.fromPath(
+  //           'recieptImage', _receiptImageFile!.path));
+  //     }
+
+  //     var response = await request.send();
+
+  //     if (response.statusCode == 200) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Payment submitted successfully!'),
+  //           backgroundColor: const Color.fromARGB(255, 73, 136, 75),
+  //         ),
+  //       );
+  //     } else {
+  //       final responseData = await response.stream.bytesToString();
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text(
+  //               'Failed to submit payment: ${json.decode(responseData)['message']}'),
+  //           backgroundColor: Colors.red,
+  //         ),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print('Error submitting payment: $e');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('An error occurred. Please try again later.'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   } finally {
+  //     setState(() {
+  //       loading = false;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +410,7 @@ class _PaymentFormState extends State<PaymentForm> {
                                 .toList(),
                             onChanged: (value) {
                               setState(() {
-                                _selectedPaymentType = value!;
+                                _selectedSY = value!;
                               });
                             },
                             decoration: const InputDecoration(
@@ -215,7 +439,7 @@ class _PaymentFormState extends State<PaymentForm> {
                                 .toList(),
                             onChanged: (value) {
                               setState(() {
-                                _selectedPaymentType = value!;
+                                _selectedSem = value!;
                               });
                             },
                             decoration: const InputDecoration(
@@ -292,50 +516,24 @@ class _PaymentFormState extends State<PaymentForm> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Bank Transaction Date',
-                          hintText: "MM/DD/YYYY",
-                          labelStyle: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          prefixIcon:
-                              Icon(Icons.date_range, color: Colors.grey),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
                     ],
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Receipt Image',
-                            labelStyle: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            prefixIcon:
-                                const Icon(Icons.image, color: Colors.grey),
-                            border: const OutlineInputBorder(),
-                            suffixIcon: _receiptImage != null
-                                ? Image.file(
-                                    _receiptImage!,
-                                    width: 48,
-                                    height: 48,
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
-                          ),
+                    TextFormField(
+                      controller: _transactionDateController,
+                      decoration: const InputDecoration(
+                        labelText: 'Bank Transaction Date',
+                        hintText: "MM/DD/YYYY",
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
+                        prefixIcon: Icon(Icons.date_range, color: Colors.grey),
+                        border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _referenceNumberController,
                       decoration: const InputDecoration(
                         labelText: 'Reference Number',
                         labelStyle: TextStyle(
@@ -349,6 +547,7 @@ class _PaymentFormState extends State<PaymentForm> {
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _paymentAmountController,
                       decoration: const InputDecoration(
                         labelText: 'Payment Amount',
                         labelStyle: TextStyle(
@@ -405,20 +604,55 @@ class _PaymentFormState extends State<PaymentForm> {
                       ),
                       keyboardType: TextInputType.phone,
                     ),
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onTap: _handlePickImage,
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Receipt Image',
+                            labelStyle: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            prefixIcon:
+                                const Icon(Icons.image, color: Colors.grey),
+                            border: const OutlineInputBorder(),
+                            suffixIcon: _receiptImage != null
+                                ? Image.file(
+                                    _receiptImage!,
+                                    width: 48,
+                                    height: 48,
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 20),
+                    if (_receiptImageBytes != null)
+                      Image.memory(
+                        _receiptImageBytes!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    const SizedBox(height: 12),
                     Center(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _submitForm,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(255, 109, 17, 10),
+                          foregroundColor: Colors.white,
+                        ),
                         child: const Text(
                           'Submit Payment',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                           ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 109, 17, 10),
-                          foregroundColor: Colors.white,
                         ),
                       ),
                     )
