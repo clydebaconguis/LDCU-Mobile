@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import 'dart:convert';
-import 'package:pushtrial/models/taphistory.dart';
+// import 'package:pushtrial/models/taphistory.dart';
 import 'package:pushtrial/models/smsbunker.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';

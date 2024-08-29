@@ -12,7 +12,7 @@ import 'enrollment.dart';
 import 'notifications.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pushtrial/api/api.dart';
-import 'package:pushtrial/models/taphistory.dart';
+// import 'package:pushtrial/models/taphistory.dart';
 import 'package:pushtrial/models/smsbunker.dart';
 // import 'package:pushtrial/main.dart';
 import 'package:pushtrial/models/user_data.dart';
@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen>
   String userFirstName = '';
   // List<TapHistory> data = [];
   String? notificationMessage;
-  // late Timer _timer;
   List<String> notifications = [];
   List<SMS> sms = [];
 
@@ -51,15 +50,11 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
     );
     _checkAndNotifyFuture = _initializeData();
-    // _timer = Timer.periodic(Duration(seconds: 30), (Timer timer) {
-    //   _checkAndNotify();
-    // });
   }
 
   Future<void> _initializeData() async {
     await getUser();
     await getSMSBunker();
-    // await _checkAndNotify();
   }
 
   getUser() async {
@@ -70,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen>
     print('User data: $user');
     {
       setState(() {
-        studid = user.id!;
+        studid = user.id;
         userFirstName = user.firstname!;
       });
     }
