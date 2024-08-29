@@ -135,6 +135,7 @@ import 'auth/login.dart';
 import 'screens/loading.dart';
 import 'screens/home.dart';
 import 'screens/notifications.dart';
+import 'schools/schools.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -240,6 +241,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
       ),
+      // initialRoute: '/schools',
       initialRoute: '/loading',
       routes: {
         '/loading': (context) => LoadingScreen(),
@@ -251,6 +253,7 @@ class MyApp extends StatelessWidget {
           }
           return HomeScreen(user: user);
         },
+        // '/schools': (context) => SchoolScreen(),
         '/notifications': (context) => NotificationsScreen(),
       },
     );

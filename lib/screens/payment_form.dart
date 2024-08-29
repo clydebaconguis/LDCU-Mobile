@@ -208,28 +208,17 @@ class _PaymentFormState extends State<PaymentForm> {
           .id
           .toString();
 
-      // var request = http.MultipartRequest('POST',
-      //     Uri.parse('http://192.168.50.13:8000/api/mobile/api_send_payment/'));
-
-      var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://assure.essentiel.ph/api/mobile/api_send_payment/'));
-
-      request.fields['studid'] = id.toString();
-      request.fields['paymentType'] = paymentType;
-      request.fields['amount'] = amount;
-      request.fields['transDate'] = transDate;
-      request.fields['refNum'] = refNum;
-      request.fields['opcontact'] = opcontact;
-      request.fields['syid'] = syid;
-      request.fields['semid'] = semid;
-
-      if (_receiptImageFile != null) {
-        request.files.add(await http.MultipartFile.fromPath(
-            'recieptImage', _receiptImageFile!.path));
-      }
-      var response = await request.send();
+      var response = await CallApi().getSendPayment(
+        id.toString(),
+        paymentType,
+        amount,
+        transDate,
+        refNum,
+        opcontact,
+        syid,
+        semid,
+        _receiptImageFile,
+      );
 
       if (response.statusCode == 200) {
         String responseString = await response.stream.bytesToString();
@@ -320,7 +309,7 @@ class _PaymentFormState extends State<PaymentForm> {
   //     ScaffoldMessenger.of(context).showSnackBar(
   //       SnackBar(
   //         content: Text('Please fill in all required fields.'),
-  //         backgroundColor: Colors.red,
+  //         backgroundColor: Color.fromARGB(255, 133, 13, 22),
   //       ),
   //     );
   //     return;
@@ -347,11 +336,16 @@ class _PaymentFormState extends State<PaymentForm> {
   //         .id
   //         .toString();
 
-  //     var request = http.MultipartRequest('POST',
-  //         Uri.parse('http://192.168.50.13:8000/api/mobile/api_send_payment/'));
+  //     // var request = http.MultipartRequest('POST',
+  //     //     Uri.parse('http://192.168.50.13:8000/api/mobile/api_send_payment/'));
+
+  //     var request = http.MultipartRequest(
+  //         'POST',
+  //         Uri.parse(
+  //             'https://assure.essentiel.ph/api/mobile/api_send_payment/'));
 
   //     request.fields['studid'] = id.toString();
-  //     request.fields['paymentType'] = paymentType!;
+  //     request.fields['paymentType'] = paymentType;
   //     request.fields['amount'] = amount;
   //     request.fields['transDate'] = transDate;
   //     request.fields['refNum'] = refNum;
@@ -363,23 +357,68 @@ class _PaymentFormState extends State<PaymentForm> {
   //       request.files.add(await http.MultipartFile.fromPath(
   //           'recieptImage', _receiptImageFile!.path));
   //     }
-
   //     var response = await request.send();
 
   //     if (response.statusCode == 200) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: Text('Payment submitted successfully!'),
-  //           backgroundColor: const Color.fromARGB(255, 73, 136, 75),
-  //         ),
-  //       );
+  //       String responseString = await response.stream.bytesToString();
+  //       print('Response: $responseString');
+
+  //       if (responseString.trim().startsWith('{')) {
+  //         var responseData = json.decode(responseString);
+
+  //         if (responseData['status'] == 0 &&
+  //             responseData['message'] == 'Reference Number already exists') {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(
+  //               content: Text('Reference Number already exists.'),
+  //               backgroundColor: Color.fromARGB(255, 133, 13, 22),
+  //             ),
+  //           );
+  //         } else {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(
+  //               content: Text('Payment submitted successfully!'),
+  //               backgroundColor: const Color.fromARGB(255, 73, 136, 75),
+  //             ),
+  //           );
+  //           _transactionDateController.clear();
+  //           _referenceNumberController.clear();
+  //           _paymentAmountController.clear();
+  //           _messageReceiverController.clear();
+  //           _contactNumberController.clear();
+  //           _receiptImageFile = null;
+  //           _receiptImageBytes = null;
+  //           setState(() {
+  //             _selectedPaymentType = null;
+  //           });
+  //         }
+  //       } else {
+  //         print('Unexpected response format: $responseString');
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text('Payment submitted successfully!'),
+  //             backgroundColor: Colors.green,
+  //           ),
+  //         );
+
+  //         _transactionDateController.clear();
+  //         _referenceNumberController.clear();
+  //         _paymentAmountController.clear();
+  //         _messageReceiverController.clear();
+  //         _contactNumberController.clear();
+  //         _receiptImageFile = null;
+  //         _receiptImageBytes = null;
+  //         setState(() {
+  //           _selectedPaymentType = null;
+  //         });
+  //       }
   //     } else {
-  //       final responseData = await response.stream.bytesToString();
+  //       final responseString = await response.stream.bytesToString();
+  //       print('Failed response: $responseString');
   //       ScaffoldMessenger.of(context).showSnackBar(
   //         SnackBar(
-  //           content: Text(
-  //               'Failed to submit payment: ${json.decode(responseData)['message']}'),
-  //           backgroundColor: Colors.red,
+  //           content: Text('Failed to submit payment: $responseString'),
+  //           backgroundColor: Color.fromARGB(255, 133, 13, 22),
   //         ),
   //       );
   //     }
@@ -388,12 +427,13 @@ class _PaymentFormState extends State<PaymentForm> {
   //     ScaffoldMessenger.of(context).showSnackBar(
   //       SnackBar(
   //         content: Text('An error occurred. Please try again later.'),
-  //         backgroundColor: Colors.red,
+  //         backgroundColor: Color.fromARGB(255, 133, 13, 22),
   //       ),
   //     );
   //   } finally {
   //     setState(() {
   //       loading = false;
+  //       _receiptImageFile = null;
   //     });
   //   }
   // }

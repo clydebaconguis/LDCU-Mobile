@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import 'dart:convert';
 import 'package:pushtrial/models/taphistory.dart';
+import 'package:pushtrial/models/smsbunker.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
@@ -20,7 +21,8 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   User user = UserData.myUser;
   int studid = 0;
-  List<TapHistory> data = [];
+  // List<TapHistory> data = [];
+  List<SMS> sms = [];
 
   @override
   void initState() {
@@ -30,7 +32,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Future<void> _initializeData() async {
     await getUser();
-    await getTapHistory();
+    await getSMSBunker();
   }
 
   Future<void> getUser() async {
@@ -44,9 +46,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     });
   }
 
-  Future<void> getTapHistory() async {
+  // Future<void> getTapHistory() async {
+  //   try {
+  //     final response = await CallApi().getTapHistory(studid);
+
+  //     if (response.statusCode == 200) {
+  //       if (response.body.isEmpty) {
+  //         print('No data returned');
+  //         return;
+  //       }
+
+  //       Iterable list = json.decode(response.body);
+  //       setState(() {
+  //         data = list.map((model) => TapHistory.fromJson(model)).toList();
+  //       });
+
+  //       print('Retrieved tap history for notifications: $data');
+  //     } else {
+  //       print(
+  //           'Failed to load tap history. Status code: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Exception occurred: $e');
+  //   }
+  // }
+
+  Future<void> getSMSBunker() async {
     try {
-      final response = await CallApi().getTapHistory(studid);
+      final response = await CallApi().getSmsBunker(studid);
 
       if (response.statusCode == 200) {
         if (response.body.isEmpty) {
@@ -56,23 +83,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
         Iterable list = json.decode(response.body);
         setState(() {
-          data = list.map((model) => TapHistory.fromJson(model)).toList();
+          sms = list.map((model) => SMS.fromJson(model)).toList();
         });
 
-        print('Retrieved tap history for notifications: $data');
+        print('Retrieved smsbunker for notifications: $sms');
       } else {
-        print(
-            'Failed to load tap history. Status code: ${response.statusCode}');
+        print('Failed to load smsnbunker. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Exception occurred: $e');
     }
   }
 
-  Future<void> updateNotificationPushStatus(
-      id, studid, newStatus, message) async {
-    final response =
-        await CallApi().getUpdatePushStatus(id, studid, newStatus, message);
+  Future<void> updateNotificationPushStatus(id, studid, newStatus) async {
+    final response = await CallApi().getUpdatePushStatus(id, studid, newStatus);
 
     if (response.statusCode == 200) {
       print('Notification push status updated successfully.');
@@ -106,14 +130,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<TapHistory> filteredData =
-        data.where((item) => item.pushstatus == 2).toList();
+    List<SMS> filteredData = sms.where((item) => item.pushstatus == 1).toList();
 
     filteredData.sort((a, b) {
-      int dateComparison = b.tdate.compareTo(a.tdate);
-      if (dateComparison == 0) {
-        return b.ttime.compareTo(a.ttime);
-      }
+      int dateComparison = b.createddatetime.compareTo(a.createddatetime);
+
       return dateComparison;
     });
 
@@ -150,9 +171,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         onTap: (CompletionHandler handler) async {
                           await handler(true);
                           await updateNotificationPushStatus(
-                              notification.id, studid, 3, notification.message);
+                              notification.id, studid, 2);
                           setState(() {
-                            data.removeAt(index);
+                            sms.removeAt(index);
                           });
                         },
                         color: const Color.fromARGB(255, 14, 19, 29),
@@ -168,7 +189,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           style: TextStyle(color: Colors.white),
                         ),
                         subtitle: Text(
-                          '${notification.tdate} ${notification.ttime}',
+                          '${notification.createddatetime}',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
