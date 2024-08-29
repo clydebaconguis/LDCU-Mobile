@@ -26,6 +26,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       Navigator.pushReplacementNamed(context, '/home', arguments: user);
     } else {
       Navigator.pushReplacementNamed(context, '/login');
+      // Navigator.pushReplacementNamed(context, '/schools');
     }
   }
 

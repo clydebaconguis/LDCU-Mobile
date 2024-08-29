@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class CarouselCard extends StatelessWidget {
+  const CarouselCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> cardData = [
@@ -39,7 +41,7 @@ class CarouselCard extends StatelessWidget {
         ),
         items: cardData
             .map((data) => Container(
-                  margin: EdgeInsets.symmetric(horizontal: 10.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20.0),
                     color: const Color.fromARGB(255, 14, 19, 29),
@@ -48,7 +50,7 @@ class CarouselCard extends StatelessWidget {
                     alignment: Alignment.bottomLeft,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -65,7 +67,7 @@ class CarouselCard extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 8.0),
+                            const SizedBox(height: 8.0),
                             Text(
                               data['description']!,
                               style: const TextStyle(

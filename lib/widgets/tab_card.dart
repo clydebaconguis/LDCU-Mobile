@@ -53,7 +53,7 @@ class TabCardState extends State<TabCard> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 40.0, left: 8.0, right: 8.0),
       child: Container(
-        constraints: BoxConstraints(maxHeight: 300),
+        constraints: const BoxConstraints(maxHeight: 300),
         child: ContainedTabBarView(
           tabs: [
             _buildTab(Icons.subscriptions, "Enrollment"),
@@ -73,11 +73,11 @@ class TabCardState extends State<TabCard> {
   Widget _buildTab(IconData icon, String title) {
     return Column(
       children: [
-        Icon(icon, color: Color.fromARGB(255, 133, 13, 22)),
-        SizedBox(height: 4.0),
+        Icon(icon, color: const Color.fromARGB(255, 133, 13, 22)),
+        const SizedBox(height: 4.0),
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 11,
             color: Color.fromARGB(255, 133, 13, 22),
@@ -90,7 +90,7 @@ class TabCardState extends State<TabCard> {
   Widget _buildTabContentEnrollment() {
     if (enInfoData.isEmpty) {
       return Container(
-        child: Text(
+        child: const Text(
           "Loading...Please check internet connection",
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -122,7 +122,7 @@ class TabCardState extends State<TabCard> {
             "Grade Level: ${latestInfo.levelname}\n"
             "$sectionText"
             "$courseText",
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Poppins',
               fontSize: 15,
               color: Colors.white,
@@ -135,7 +135,7 @@ class TabCardState extends State<TabCard> {
 
   Widget _buildTabContentClass() {
     if (listOfItem3.isEmpty) {
-      return Center(
+      return const Center(
         child: Text(
           "No classes scheduled for today.",
           style: TextStyle(
@@ -164,14 +164,14 @@ class TabCardState extends State<TabCard> {
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(10.0),
                     width: 70,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           schedItem.room,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 13,
                             color: Colors.white,
@@ -182,14 +182,14 @@ class TabCardState extends State<TabCard> {
                   ),
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       color: const Color.fromARGB(255, 14, 19, 29),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             schedItem.subject,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,
                               color: Colors.white,
@@ -198,19 +198,19 @@ class TabCardState extends State<TabCard> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             "Teacher: ${schedItem.teacher}",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 12,
                               color: Colors.white,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             "Time: ${schedItem.start} - ${schedItem.end}",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 12,
                               color: Colors.white,
@@ -240,7 +240,7 @@ class TabCardState extends State<TabCard> {
               DateFormat('MMMM d, yyyy').format(event.startTime);
           return Card(
             color: const Color.fromARGB(255, 133, 13, 22),
-            margin: EdgeInsets.symmetric(vertical: 8.0),
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
@@ -251,7 +251,7 @@ class TabCardState extends State<TabCard> {
                 children: [
                   Text(
                     event.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
@@ -259,26 +259,26 @@ class TabCardState extends State<TabCard> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
-                  SizedBox(height: 5.0),
+                  const SizedBox(height: 5.0),
                   Text(
                     event.venue,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14.0,
                     ),
                   ),
-                  SizedBox(height: 5.0),
+                  const SizedBox(height: 5.0),
                   Text(
                     formattedDate,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14.0,
                     ),
                   ),
-                  SizedBox(height: 5.0),
+                  const SizedBox(height: 5.0),
                   Text(
                     event.time,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14.0,
                     ),
@@ -543,7 +543,7 @@ class TabCardState extends State<TabCard> {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: Scaffold(
       body: TabCard(),
     ),

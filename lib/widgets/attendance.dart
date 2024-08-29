@@ -113,7 +113,7 @@ class _AttendanceState extends State<AttendanceScreen> {
         children: [
           selectedYear.isNotEmpty
               ? DropdownButtonFormField2<String>(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'School Year',
                     labelStyle: TextStyle(
                       fontFamily: 'Poppins',

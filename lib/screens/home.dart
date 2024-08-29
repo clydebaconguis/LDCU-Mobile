@@ -12,7 +12,8 @@ import 'enrollment.dart';
 import 'notifications.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pushtrial/api/api.dart';
-import 'package:pushtrial/models/taphistory.dart';
+// import 'package:pushtrial/models/taphistory.dart';
+import 'package:pushtrial/models/smsbunker.dart';
 // import 'package:pushtrial/main.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'dart:convert';
@@ -36,10 +37,10 @@ class _HomeScreenState extends State<HomeScreen>
   int studid = 0;
   int id = 0;
   String userFirstName = '';
-  List<TapHistory> data = [];
+  // List<TapHistory> data = [];
   String? notificationMessage;
-  // late Timer _timer;
   List<String> notifications = [];
+  List<SMS> sms = [];
 
   @override
   void initState() {
@@ -49,15 +50,11 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
     );
     _checkAndNotifyFuture = _initializeData();
-    // _timer = Timer.periodic(Duration(seconds: 30), (Timer timer) {
-    //   _checkAndNotify();
-    // });
   }
 
   Future<void> _initializeData() async {
     await getUser();
-    await getTapHistory();
-    // await _checkAndNotify();
+    await getSMSBunker();
   }
 
   getUser() async {
@@ -68,15 +65,41 @@ class _HomeScreenState extends State<HomeScreen>
     print('User data: $user');
     {
       setState(() {
-        studid = user.id!;
+        studid = user.id;
         userFirstName = user.firstname!;
       });
     }
   }
 
-  getTapHistory() async {
+  // getTapHistory() async {
+  //   try {
+  //     final response = await CallApi().getTapHistory(studid);
+
+  //     if (response.statusCode == 200) {
+  //       if (response.body.isEmpty) {
+  //         print('No data returned');
+  //         return;
+  //       }
+
+  //       Iterable list = json.decode(response.body);
+  //       setState(() {
+  //         data = list.map((model) => TapHistory.fromJson(model)).toList();
+  //         _notificationCount = data.where((tap) => tap.pushstatus == 1).length;
+  //       });
+
+  //       // print('Retrieved tap history: $data');
+  //     } else {
+  //       print(
+  //           'Failed to load tap history. Status code: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Exception occurred: $e');
+  //   }
+  // }
+
+  Future<void> getSMSBunker() async {
     try {
-      final response = await CallApi().getTapHistory(studid);
+      final response = await CallApi().getSmsBunker(studid);
 
       if (response.statusCode == 200) {
         if (response.body.isEmpty) {
@@ -86,24 +109,21 @@ class _HomeScreenState extends State<HomeScreen>
 
         Iterable list = json.decode(response.body);
         setState(() {
-          data = list.map((model) => TapHistory.fromJson(model)).toList();
-          _notificationCount = data.where((tap) => tap.pushstatus == 2).length;
+          sms = list.map((model) => SMS.fromJson(model)).toList();
+          _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
         });
 
-        // print('Retrieved tap history: $data');
+        print('Retrieved smsbunker $sms');
       } else {
-        print(
-            'Failed to load tap history. Status code: ${response.statusCode}');
+        print('Failed to load smsnbunker. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Exception occurred: $e');
     }
   }
 
-  Future<void> updateNotificationPushStatus(
-      id, studid, newStatus, message) async {
-    final response =
-        await CallApi().getUpdatePushStatus(id, studid, newStatus, message);
+  Future<void> updateNotificationPushStatus(id, studid, newStatus) async {
+    final response = await CallApi().getUpdatePushStatus(id, studid, newStatus);
 
     if (response.statusCode == 200) {
       print('Notification push status updated successfully.');
@@ -121,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen>
   //     }
 
   //     for (var tap in data) {
-  //       if (tap.pushstatus == 1) {
+  //       if (tap.pushstatus == 0) {
   //         notificationMessage =
   //             "Hi! $userFirstName, your status has been updated.";
   //         await showNotification(userFirstName);
@@ -130,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen>
   //             'Updating push status for ID: ${tap.id}, Student ID: ${tap.studid}');
 
   //         final response = await CallApi()
-  //             .getUpdatePushStatus(tap.id, tap.studid, 2, notificationMessage);
+  //             .getUpdatePushStatus(tap.id, tap.studid, 1, notificationMessage);
   //         if (response.statusCode == 200) {
   //           print('Push status updated successfully.');
   //         } else {
@@ -235,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen>
               );
             },
           ),
-          PopupMenuButton<TapHistory>(
+          PopupMenuButton<SMS>(
             icon: Stack(
               children: [
                 const Icon(Icons.notifications_active, color: Colors.white),
@@ -269,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen>
               ],
             ),
             offset: const Offset(0, 50),
-            onSelected: (TapHistory selectedNotification) {
+            onSelected: (SMS selectedNotification) {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -279,30 +299,27 @@ class _HomeScreenState extends State<HomeScreen>
                     actions: [
                       TextButton(
                         onPressed: () async {
-                          final updatedNotification = TapHistory(
+                          final updatedNotification = SMS(
                             id: selectedNotification.id,
                             studid: selectedNotification.studid,
-                            tdate: selectedNotification.tdate,
-                            ttime: selectedNotification.ttime,
-                            tapstate: selectedNotification.tapstate,
-                            pushstatus: 3,
+                            pushstatus: 2,
+                            receiver: selectedNotification.receiver,
                             message: selectedNotification.message,
                           );
                           setState(() {
-                            data = data
+                            sms = sms
                                 .map((tap) => tap.id == updatedNotification.id
                                     ? updatedNotification
                                     : tap)
                                 .toList();
                             _notificationCount =
-                                data.where((tap) => tap.pushstatus == 2).length;
+                                sms.where((tap) => tap.pushstatus == 1).length;
                           });
 
                           await updateNotificationPushStatus(
                             updatedNotification.id,
                             updatedNotification.studid,
                             updatedNotification.pushstatus,
-                            updatedNotification.message,
                           );
 
                           Navigator.of(context).pop();
@@ -316,13 +333,13 @@ class _HomeScreenState extends State<HomeScreen>
             },
             itemBuilder: (BuildContext context) {
               final filteredNotifications =
-                  data.where((tap) => tap.pushstatus == 2).toList();
+                  sms.where((tap) => tap.pushstatus == 1).toList();
 
               _notificationCount = filteredNotifications.length;
 
               return [
                 ...filteredNotifications.map(
-                  (notification) => PopupMenuItem<TapHistory>(
+                  (notification) => PopupMenuItem<SMS>(
                     value: notification,
                     child: Container(
                       constraints: const BoxConstraints(
@@ -338,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
                 const PopupMenuDivider(),
-                PopupMenuItem<TapHistory>(
+                PopupMenuItem<SMS>(
                   child: InkWell(
                     onTap: () {
                       Navigator.pop(context);

@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 class CallApi {
   // final String _mainDomain = "https://app-ldcu.essentiel.ph/";
@@ -28,6 +29,7 @@ class CallApi {
       "api/mobile/api_get_onlinepaymentoptions";
   final String _sendPayment = "api/mobile/api_send_payment";
   final String _onlinePayments = "api/mobile/api_get_onlinepayments";
+  final String _smsBunker = "api/mobile/api_get_smsbunker";
 
   getSchoolInfo() async {
     var fullUrl = '$_mainDomain$_schoolinfo';
@@ -36,12 +38,12 @@ class CallApi {
     );
   }
 
-  // getSaveToken(studid, fcmtoken) async {
-  //   var fullUrl = '$_mainDomain$_saveToken?studid=$studid&fcmtoken=$fcmtoken';
-  //   return await http.post(
-  //     Uri.parse(fullUrl),
-  //   );
-  // }
+  getSmsBunker(studid) async {
+    var fullUrl = '$_mainDomain$_smsBunker?studid=$studid';
+    return await http.get(
+      Uri.parse(fullUrl),
+    );
+  }
 
   getOnlinePayments(sid) async {
     var fullUrl = '$_mainDomain$_onlinePayments?sid=$sid';
@@ -50,13 +52,38 @@ class CallApi {
     );
   }
 
-  getSendPayment(studid, paymentType, amount, transDate, refNum, opcontact,
-      syid, semid) async {
-    var fullUrl =
-        '$_mainDomain$_sendPayment?studid=$studid&paymentType=$paymentType&amount=$amount&transDate=$transDate&refNum=$refNum&opcontact=$opcontact&syid=$syid&semid=$semid';
-    return await http.post(
-      Uri.parse(fullUrl),
-    );
+  Future<http.StreamedResponse> getSendPayment(
+    String studid,
+    String paymentType,
+    String amount,
+    String transDate,
+    String refNum,
+    String opcontact,
+    String syid,
+    String semid,
+    File? receiptImageFile,
+  ) async {
+    var fullUrl = Uri.parse('$_mainDomain$_sendPayment');
+
+    var request = http.MultipartRequest('POST', fullUrl);
+
+    request.fields['studid'] = studid;
+    request.fields['paymentType'] = paymentType;
+    request.fields['amount'] = amount;
+    request.fields['transDate'] = transDate;
+    request.fields['refNum'] = refNum;
+    request.fields['opcontact'] = opcontact;
+    request.fields['syid'] = syid;
+    request.fields['semid'] = semid;
+
+    if (receiptImageFile != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'recieptImage',
+        receiptImageFile.path,
+      ));
+    }
+
+    return await request.send();
   }
 
   getOnlinePaymentsOptions(id) async {
@@ -87,9 +114,17 @@ class CallApi {
     );
   }
 
-  getUpdatePushStatus(id, studid, pushstatus, message) async {
+  // getUpdatePushStatus(id, studid, pushstatus, message) async {
+  //   var fullUrl =
+  //       '$_mainDomain$_updatePushStatus?id=$id&studid=$studid&pushstatus=$pushstatus&message=$message';
+  //   return await http.post(
+  //     Uri.parse(fullUrl),
+  //   );
+  // }
+
+  getUpdatePushStatus(id, studid, pushstatus) async {
     var fullUrl =
-        '$_mainDomain$_updatePushStatus?id=$id&studid=$studid&pushstatus=$pushstatus&message=$message';
+        '$_mainDomain$_updatePushStatus?id=$id&studid=$studid&pushstatus=$pushstatus';
     return await http.post(
       Uri.parse(fullUrl),
     );
