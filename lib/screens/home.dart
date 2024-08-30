@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen>
           _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
         });
 
-        print('Retrieved smsbunker $sms');
+        // print('Retrieved smsbunker $sms');
       } else {
         print('Failed to load smsnbunker. Status code: ${response.statusCode}');
       }

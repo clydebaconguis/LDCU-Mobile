@@ -4,6 +4,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pushtrial/main.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/user_data.dart';
+import 'package:pushtrial/models/user_login.dart';
+import 'package:pushtrial/models/login.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/taphistory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +17,9 @@ class PushNotifications {
   static final FlutterLocalNotificationsPlugin
       _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   static User user = UserData.myUser;
+  static Login userLogin = UserDataLogin.myUserLogin;
   static int? studid;
+  static int? type;
   static String? userFirstName;
   static List<TapHistory>? data;
 
@@ -32,6 +36,7 @@ class PushNotifications {
 
     getFCMToken();
     await getUser();
+    await getLogin();
     getTapHistory();
   }
 
@@ -71,7 +76,7 @@ class PushNotifications {
     }
 
     try {
-      final response = await CallApi().getSaveToken(studid!, token);
+      final response = await CallApi().getSaveToken(studid!, type!, token);
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
 
@@ -134,6 +139,17 @@ class PushNotifications {
 
     studid = user.id;
     userFirstName = user.firstname;
+  }
+
+  static Future getLogin() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final json = preferences.getString('userlogin');
+    userLogin = json == null
+        ? UserDataLogin.myUserLogin
+        : Login.fromJson(jsonDecode(json));
+    print('User login data in push notifications: $userLogin');
+
+    type = userLogin.type;
   }
 
   static Future getTapHistory() async {

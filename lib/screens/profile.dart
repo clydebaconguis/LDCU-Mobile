@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pushtrial/models/user_login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:pushtrial/api/api.dart';
@@ -6,6 +7,7 @@ import '../auth/login.dart';
 import 'package:pushtrial/models/enrollment_info.dart';
 import 'dart:convert';
 import 'package:pushtrial/models/user.dart';
+import 'package:pushtrial/models/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -23,6 +25,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   User user = UserData.myUser;
+  Login userLogin = UserDataLogin.myUserLogin;
   String id = '0';
   String selectedYear = '';
   List<EnrollmentInfo> enInfoData = [];
@@ -446,15 +449,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final userJson = prefs.getString('user');
+    final userLoginJson = prefs.getString('userlogin');
     if (userJson != null) {
       final user = User.fromJson(jsonDecode(userJson));
       final studid = user.id;
+      final userLogin = Login.fromJson(jsonDecode(userLoginJson!));
+      final type = userLogin.type;
 
       final fcmtoken = await _firebaseMessaging.getToken();
 
       try {
         final response = await CallApi().getDeleteToken(
           studid,
+          type,
           fcmtoken,
         );
 
@@ -477,7 +484,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => Login()),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
         (route) => false,
       );
     });

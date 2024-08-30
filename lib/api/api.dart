@@ -5,8 +5,8 @@ import 'dart:io';
 class CallApi {
   // final String _mainDomain = "https://app-ldcu.essentiel.ph/";
   // final String _mainDomain = "http://127.0.0.1:8000/";
-  // final String _mainDomain = "http://192.168.50.13:8000/";
-  final String _mainDomain = "https://assure.essentiel.ph/";
+  final String _mainDomain = "http://192.168.50.13:8000/";
+  // final String _mainDomain = "https://assure.essentiel.ph/";
   final String _esDomain = "api/mobile/api_login";
   final String _enrollmentInfo = "api/mobile/api_enrollmentinfo";
   final String _enrollmentData = "api/mobile/api_enrollmentdata";
@@ -93,15 +93,17 @@ class CallApi {
     );
   }
 
-  getDeleteToken(studid, fcmtoken) async {
-    var fullUrl = '$_mainDomain$_deleteToken?studid=$studid&fcmtoken=$fcmtoken';
+  getDeleteToken(studid, type, fcmtoken) async {
+    var fullUrl =
+        '$_mainDomain$_deleteToken?studid=$studid&type=$type&fcmtoken=$fcmtoken';
     return await http.post(
       Uri.parse(fullUrl),
     );
   }
 
-  getSaveToken(int studid, String fcmtoken) async {
-    var fullUrl = '$_mainDomain$_saveToken?studid=$studid&fcmtoken=$fcmtoken';
+  getSaveToken(int studid, int type, String fcmtoken) async {
+    var fullUrl =
+        '$_mainDomain$_saveToken?studid=$studid&type=$type&fcmtoken=$fcmtoken';
     return await http.post(
       Uri.parse(fullUrl),
     );
