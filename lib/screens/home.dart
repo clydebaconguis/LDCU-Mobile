@@ -16,6 +16,8 @@ import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/smsbunker.dart';
 // import 'package:pushtrial/main.dart';
 import 'package:pushtrial/models/user_data.dart';
+import 'package:pushtrial/models/login.dart';
+import 'package:pushtrial/models/user_login.dart';
 import 'dart:convert';
 import 'dart:async';
 
@@ -41,6 +43,8 @@ class _HomeScreenState extends State<HomeScreen>
   String? notificationMessage;
   List<String> notifications = [];
   List<SMS> sms = [];
+  Login userLogin = UserDataLogin.myUserLogin;
+  int type = 0;
 
   @override
   void initState() {
@@ -54,7 +58,19 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<void> _initializeData() async {
     await getUser();
+    await getLogin();
     await getSMSBunker();
+  }
+
+  Future<void> getLogin() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final json = preferences.getString('userlogin');
+    userLogin = json == null
+        ? UserDataLogin.myUserLogin
+        : Login.fromJson(jsonDecode(json));
+    print('User login data in notifications: $userLogin');
+
+    type = userLogin.type;
   }
 
   getUser() async {
@@ -97,6 +113,31 @@ class _HomeScreenState extends State<HomeScreen>
   //   }
   // }
 
+  // Future<void> getSMSBunker() async {
+  //   try {
+  //     final response = await CallApi().getSmsBunker(studid);
+
+  //     if (response.statusCode == 200) {
+  //       if (response.body.isEmpty) {
+  //         print('No data returned');
+  //         return;
+  //       }
+
+  //       Iterable list = json.decode(response.body);
+  //       setState(() {
+  //         sms = list.map((model) => SMS.fromJson(model)).toList();
+  //         _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
+  //       });
+
+  //       // print('Retrieved smsbunker $sms');
+  //     } else {
+  //       print('Failed to load smsnbunker. Status code: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Exception occurred: $e');
+  //   }
+  // }
+
   Future<void> getSMSBunker() async {
     try {
       final response = await CallApi().getSmsBunker(studid);
@@ -107,15 +148,25 @@ class _HomeScreenState extends State<HomeScreen>
           return;
         }
 
-        Iterable list = json.decode(response.body);
+        Map<String, dynamic> data = json.decode(response.body);
+
         setState(() {
-          sms = list.map((model) => SMS.fromJson(model)).toList();
-          _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
+          if (userLogin.type == 7) {
+            sms = (data['smsbunkerstudent'] as List)
+                .map((model) => SMS.fromJson(model))
+                .toList();
+            _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
+          } else if (userLogin.type == 9) {
+            sms = (data['smsbunkerparents'] as List)
+                .map((model) => SMS.fromJson(model))
+                .toList();
+            _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
+          }
         });
 
-        // print('Retrieved smsbunker $sms');
+        print('Retrieved smsbunker for home: $sms');
       } else {
-        print('Failed to load smsnbunker. Status code: ${response.statusCode}');
+        print('Failed to load smsbunker. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Exception occurred: $e');

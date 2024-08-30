@@ -62,9 +62,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     type = userLogin.type;
   }
 
-  // Future<void> getTapHistory() async {
+  // Future<void> getSMSBunker() async {
   //   try {
-  //     final response = await CallApi().getTapHistory(studid);
+  //     final response = await CallApi().getSmsBunker(studid);
 
   //     if (response.statusCode == 200) {
   //       if (response.body.isEmpty) {
@@ -74,13 +74,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   //       Iterable list = json.decode(response.body);
   //       setState(() {
-  //         data = list.map((model) => TapHistory.fromJson(model)).toList();
+  //         sms = list.map((model) => SMS.fromJson(model)).toList();
   //       });
 
-  //       print('Retrieved tap history for notifications: $data');
+  //       // print('Retrieved smsbunker for notifications: $sms');
   //     } else {
-  //       print(
-  //           'Failed to load tap history. Status code: ${response.statusCode}');
+  //       print('Failed to load smsnbunker. Status code: ${response.statusCode}');
   //     }
   //   } catch (e) {
   //     print('Exception occurred: $e');
@@ -97,14 +96,23 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           return;
         }
 
-        Iterable list = json.decode(response.body);
+        Map<String, dynamic> data = json.decode(response.body);
+
         setState(() {
-          sms = list.map((model) => SMS.fromJson(model)).toList();
+          if (userLogin.type == 7) {
+            sms = (data['smsbunkerstudent'] as List)
+                .map((model) => SMS.fromJson(model))
+                .toList();
+          } else if (userLogin.type == 9) {
+            sms = (data['smsbunkerparents'] as List)
+                .map((model) => SMS.fromJson(model))
+                .toList();
+          }
         });
 
-        // print('Retrieved smsbunker for notifications: $sms');
+        print('Retrieved smsbunker for notifications: $sms');
       } else {
-        print('Failed to load smsnbunker. Status code: ${response.statusCode}');
+        print('Failed to load smsbunker. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Exception occurred: $e');
