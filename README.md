@@ -1,4 +1,4 @@
-# pushtrial
+# Student Portal
 
 A new Flutter project.
 
