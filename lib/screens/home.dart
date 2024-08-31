@@ -87,57 +87,6 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  // getTapHistory() async {
-  //   try {
-  //     final response = await CallApi().getTapHistory(studid);
-
-  //     if (response.statusCode == 200) {
-  //       if (response.body.isEmpty) {
-  //         print('No data returned');
-  //         return;
-  //       }
-
-  //       Iterable list = json.decode(response.body);
-  //       setState(() {
-  //         data = list.map((model) => TapHistory.fromJson(model)).toList();
-  //         _notificationCount = data.where((tap) => tap.pushstatus == 1).length;
-  //       });
-
-  //       // print('Retrieved tap history: $data');
-  //     } else {
-  //       print(
-  //           'Failed to load tap history. Status code: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print('Exception occurred: $e');
-  //   }
-  // }
-
-  // Future<void> getSMSBunker() async {
-  //   try {
-  //     final response = await CallApi().getSmsBunker(studid);
-
-  //     if (response.statusCode == 200) {
-  //       if (response.body.isEmpty) {
-  //         print('No data returned');
-  //         return;
-  //       }
-
-  //       Iterable list = json.decode(response.body);
-  //       setState(() {
-  //         sms = list.map((model) => SMS.fromJson(model)).toList();
-  //         _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
-  //       });
-
-  //       // print('Retrieved smsbunker $sms');
-  //     } else {
-  //       print('Failed to load smsnbunker. Status code: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print('Exception occurred: $e');
-  //   }
-  // }
-
   Future<void> getSMSBunker() async {
     try {
       final response = await CallApi().getSmsBunker(studid);
@@ -157,14 +106,19 @@ class _HomeScreenState extends State<HomeScreen>
                 .toList();
             _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
           } else if (userLogin.type == 9) {
-            sms = (data['smsbunkerparents'] as List)
+            final smsbunkerParents = (data['smsbunkerparents'] as List)
                 .map((model) => SMS.fromJson(model))
                 .toList();
+            final tapbunkerParents = (data['tapbunkerparents'] as List)
+                .map((model) => SMS.fromJson(model))
+                .toList();
+
+            sms = [...smsbunkerParents, ...tapbunkerParents];
             _notificationCount = sms.where((tap) => tap.pushstatus == 1).length;
           }
         });
 
-        print('Retrieved smsbunker for home: $sms');
+        // print('Retrieved smsbunker for home: $sms');
       } else {
         print('Failed to load smsbunker. Status code: ${response.statusCode}');
       }
@@ -498,7 +452,6 @@ class _HomeScreenState extends State<HomeScreen>
                               children: [
                                 Expanded(child: Container()),
                                 const Center(
-                                  // padding: EdgeInsets.only(bottom: 5.0),
                                   child: ActionButtons(),
                                 ),
                                 const Padding(

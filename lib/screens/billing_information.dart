@@ -96,79 +96,98 @@ class BillingInformationState extends State<BillingInformationPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // const SizedBox(height: 10),
-                  Center(
-                    child: Container(
-                      width: double.infinity,
-                      height: 350,
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: DataTable(
-                            columnSpacing: 40.0,
-                            dividerThickness: 0,
-                            columns: const [
-                              DataColumn(
-                                  label: Text('Particulars',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        fontSize: 11,
-                                      ))),
-                              DataColumn(
-                                  label: Text('Amount',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        fontSize: 11,
-                                      ))),
-                              DataColumn(
-                                  label: Text('Deductions',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        fontSize: 11,
-                                      ))),
-                            ],
-                            rows: data.map((ledger) {
-                              return DataRow(cells: [
-                                DataCell(
-                                  Container(
-                                    width: 90,
-                                    child: Text(
-                                      ledger.particulars,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 11,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: constraints.maxWidth,
+                            ),
+                            child: DataTable(
+                              columnSpacing:
+                                  constraints.maxWidth < 600 ? 10.0 : 20.0,
+                              dividerThickness: 0,
+                              columns: const [
+                                DataColumn(
+                                    label: Text('Particulars',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 11,
+                                        ))),
+                                DataColumn(
+                                    label: Text('Amount',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 11,
+                                        ))),
+                                DataColumn(
+                                  label: Text(
+                                    'Deductions',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 11,
                                     ),
+                                    textAlign: TextAlign.right,
                                   ),
                                 ),
-                                DataCell(Text(ledger.amount,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 11,
+                              ],
+                              rows: data.map((ledger) {
+                                return DataRow(cells: [
+                                  DataCell(
+                                    Container(
+                                      width: 90,
+                                      child: Text(
+                                        ledger.particulars,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 11,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
                                     ),
-                                    textAlign: TextAlign.right)),
-                                DataCell(Text(ledger.payment,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 11,
+                                  ),
+                                  DataCell(
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          ledger.amount,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    textAlign: TextAlign.right)),
-                              ]);
-                            }).toList(),
+                                  ),
+                                  DataCell(
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          ledger.payment,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ]);
+                              }).toList(),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ],

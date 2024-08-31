@@ -83,6 +83,8 @@ flutter:
     - assets/app_icon.png
     - assets/cklogo.png
     - assets/bell.png
+    - assets/gcash.jpg
+    - assets/palawan.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -31,7 +31,7 @@ class _LoginState extends State<LoginScreen> {
 
       try {
         final response = await _callApi.login(username, password);
-        print('Response body: ${response.body}');
+        // print('Response body: ${response.body}');
 
         if (response.statusCode == 200) {
           if (response.body.isNotEmpty) {
@@ -49,10 +49,10 @@ class _LoginState extends State<LoginScreen> {
               await prefs.setString(
                   'userlogin', jsonEncode(userLogin.toJson()));
 
-              String? token = await PushNotifications.getFCMToken();
-              if (token != null) {
-                await _callApi.getSaveToken(user.id, userLogin.type, token);
-              }
+              // String? token = await PushNotifications.getFCMToken();
+              // if (token != null) {
+              //   await _callApi.getSaveToken(user.id, userLogin.type, token);
+              // }
 
               Navigator.pushReplacementNamed(context, '/home', arguments: user);
             } else {

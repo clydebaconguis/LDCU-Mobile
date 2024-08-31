@@ -51,7 +51,7 @@ class TabCardState extends State<TabCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 40.0, left: 8.0, right: 8.0),
+      padding: const EdgeInsets.only(bottom: 30.0, left: 8.0, right: 8.0),
       child: Container(
         constraints: const BoxConstraints(maxHeight: 300),
         child: ContainedTabBarView(
