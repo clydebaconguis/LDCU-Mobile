@@ -303,36 +303,69 @@ class PaymentPageState extends State<PaymentPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
             ),
-            child: Container(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    formattedDate,
-                    style: const TextStyle(color: Colors.grey, fontSize: 10),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: ClipOval(
+                    child: transaction.paytype == 'CASH'
+                        ? Container(
+                            color: Colors.grey[200],
+                            padding: EdgeInsets.all(10),
+                            child: Icon(
+                              Icons.payments,
+                              size: 25,
+                              color: Colors.black,
+                            ),
+                          )
+                        : Container(
+                            color: Colors.grey[200],
+                            padding: EdgeInsets.all(10),
+                            child: Icon(
+                              Icons.credit_score,
+                              size: 25,
+                              color: Colors.black,
+                            ),
+                          ),
                   ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${transaction.paytype} - OR#: ${transaction.ornum}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.black),
-                      ),
-                      Text(
-                        'Php $formattedAmount',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Colors.green,
+                ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          formattedDate,
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 10),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${transaction.paytype} - OR#: ${transaction.ornum}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 12),
+                            ),
+                            Text(
+                              'Php $formattedAmount',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },
