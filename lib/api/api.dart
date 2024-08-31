@@ -30,6 +30,22 @@ class CallApi {
   final String _sendPayment = "api/mobile/api_send_payment";
   final String _onlinePayments = "api/mobile/api_get_onlinepayments";
   final String _smsBunker = "api/mobile/api_get_smsbunker";
+  final String _reportCardBE = "/api/mobile/api_enrollment_reportcard";
+  final String _studentAttendance = "api/mobile/api_attendance";
+
+  getStudentAttendance(studid, syid) async {
+    var fullUrl = '$_mainDomain$_studentAttendance?studid=$studid&syid=$syid';
+    return await http.get(
+      Uri.parse(fullUrl),
+    );
+  }
+
+  getReportCardBE(studid, syid) async {
+    var fullUrl = '$_mainDomain$_reportCardBE?studid=$studid&syid=$syid';
+    return await http.get(
+      Uri.parse(fullUrl),
+    );
+  }
 
   getSchoolInfo() async {
     var fullUrl = '$_mainDomain$_schoolinfo';

@@ -86,6 +86,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
               q3: model['prefigrade'] ?? 0,
               q4: model['finalgrade'] ?? 0,
               fg: model['fg'] ?? '',
+              finalrating: model['finalrating'] ?? '',
               actiontaken: model['actiontaken'] ?? '',
             );
           }).toList();
@@ -102,6 +103,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                     q3: '',
                     q4: '',
                     fg: '',
+                    finalrating: '',
                     actiontaken: '',
                     subjdesc: '');
           }).toList();

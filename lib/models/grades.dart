@@ -6,6 +6,7 @@ class Grades {
   final String q3;
   final String q4;
   final String fg;
+  final String finalrating;
   final String actiontaken;
 
   Grades({
@@ -16,6 +17,7 @@ class Grades {
     required this.q3,
     required this.q4,
     required this.fg,
+    required this.finalrating,
     required this.actiontaken,
   });
 
@@ -27,6 +29,7 @@ class Grades {
     var q3 = json['q3'].toString();
     var q4 = json['q4'].toString();
     var fg = json['fg'].toString();
+    var finalrating = json['finalrating'].toString();
     var actiontaken = json['actiontaken'] ?? '';
     return Grades(
         subjcode: subjcode,
@@ -35,6 +38,7 @@ class Grades {
         q3: q3,
         q4: q4,
         fg: fg,
+        finalrating: finalrating,
         actiontaken: actiontaken,
         subjdesc: subjdesc);
   }
@@ -46,6 +50,7 @@ class Grades {
     var q3 = json['q3'].toString();
     var q4 = json['q4'].toString();
     var fg = json['fg'].toString();
+    var finalrating = json['finalrating'].toString();
     var actiontaken = json['actiontaken'] ?? '';
     return Grades(
         subjcode: subjcode,
@@ -54,7 +59,13 @@ class Grades {
         q3: q3,
         q4: q4,
         fg: fg,
+        finalrating: finalrating,
         actiontaken: actiontaken,
         subjdesc: subjcode);
+  }
+
+  @override
+  String toString() {
+    return 'Grades(subjcode: $subjcode, subjdesc: $subjdesc, q1: $q1, q2: $q2, q3: $q3, q4: $q4, fg: $fg, finalrating: $finalrating, actiontaken: $actiontaken)';
   }
 }
