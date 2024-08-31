@@ -113,11 +113,11 @@ class MyApp extends StatelessWidget {
       initialRoute: '/loading',
       routes: {
         '/loading': (context) => LoadingScreen(),
-        '/login': (context) => Login(),
+        '/login': (context) => LoginScreen(),
         '/home': (context) {
           final user = ModalRoute.of(context)!.settings.arguments as User?;
           if (user == null) {
-            return Login();
+            return LoginScreen();
           }
           return HomeScreen(user: user);
         },

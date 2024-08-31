@@ -51,7 +51,7 @@ class TabCardState extends State<TabCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 40.0, left: 8.0, right: 8.0),
+      padding: const EdgeInsets.only(bottom: 30.0, left: 8.0, right: 8.0),
       child: Container(
         constraints: const BoxConstraints(maxHeight: 300),
         child: ContainedTabBarView(
@@ -230,12 +230,16 @@ class TabCardState extends State<TabCard> {
   }
 
   Widget _buildTabContentCalendar() {
+    DateTime now = DateTime.now();
+    List<Event> futureEvents =
+        events.where((event) => event.startTime.isAfter(now)).toList();
+
     return Padding(
       padding: const EdgeInsets.all(30.0),
       child: ListView.builder(
-        itemCount: events.length,
+        itemCount: futureEvents.length,
         itemBuilder: (context, index) {
-          Event event = events[index];
+          Event event = futureEvents[index];
           String formattedDate =
               DateFormat('MMMM d, yyyy').format(event.startTime);
           return Card(

@@ -3,14 +3,15 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import '../models/user.dart';
+import '../models/login.dart';
 import 'package:pushtrial/push_notifications.dart';
 
-class Login extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -36,18 +37,22 @@ class _LoginState extends State<Login> {
           if (response.body.isNotEmpty) {
             final Map<String, dynamic> responseData = jsonDecode(response.body);
 
-            if (responseData['stud'] != null) {
+            if (responseData['stud'] != null &&
+                responseData['userlogin'] != null) {
               final User user = User.fromJson(responseData['stud']);
+              final Login userLogin = Login.fromJson(responseData['userlogin']);
               final prefs = await SharedPreferences.getInstance();
 
               await prefs.setString('user', jsonEncode(user.toJson()));
               await prefs.setString(
                   'studid', responseData['stud']['id'].toString());
+              await prefs.setString(
+                  'userlogin', jsonEncode(userLogin.toJson()));
 
-              String? token = await PushNotifications.getFCMToken();
-              if (token != null) {
-                await _callApi.getSaveToken(user.id, token);
-              }
+              // String? token = await PushNotifications.getFCMToken();
+              // if (token != null) {
+              //   await _callApi.getSaveToken(user.id, userLogin.type, token);
+              // }
 
               Navigator.pushReplacementNamed(context, '/home', arguments: user);
             } else {
@@ -69,6 +74,53 @@ class _LoginState extends State<Login> {
       }
     }
   }
+
+  // Future<void> _login() async {
+  //   if (_formKey.currentState?.validate() ?? false) {
+  //     final username = _usernameController.text;
+  //     final password = _passwordController.text;
+
+  //     try {
+  //       final response = await _callApi.login(username, password);
+  //       print('Response body: ${response.body}');
+
+  //       if (response.statusCode == 200) {
+  //         if (response.body.isNotEmpty) {
+  //           final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+  //           if (responseData['stud'] != null) {
+  //             final User user = User.fromJson(responseData['stud']);
+  //             final prefs = await SharedPreferences.getInstance();
+
+  //             await prefs.setString('user', jsonEncode(user.toJson()));
+  //             await prefs.setString(
+  //                 'studid', responseData['stud']['id'].toString());
+
+  //             // String? token = await PushNotifications.getFCMToken();
+  //             // if (token != null) {
+  //             //   await _callApi.getSaveToken(user.id, type, token);
+  //             // }
+
+  //             Navigator.pushReplacementNamed(context, '/home', arguments: user);
+  //           } else {
+  //             _showSnackBar('Invalid username or password');
+  //           }
+  //         } else {
+  //           _showSnackBar('Response body is empty');
+  //         }
+  //       } else if (response.statusCode == 400) {
+  //         _showSnackBar('Bad request. Please check your input.');
+  //       } else if (response.statusCode == 401) {
+  //         _showSnackBar('Unauthorized. Please check your credentials.');
+  //       } else {
+  //         _showSnackBar('Failed to login. Please try again.');
+  //       }
+  //     } catch (e) {
+  //       print('Error: $e');
+  //       _showSnackBar('An error occurred. Please try again.');
+  //     }
+  //   }
+  // }
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

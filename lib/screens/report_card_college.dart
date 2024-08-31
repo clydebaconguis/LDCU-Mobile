@@ -25,7 +25,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
   var id = '0';
   var studid = '0';
   var syid = 0;
-  var semid = 0;
+  var semid = 1;
   var gradelevel = 0;
   var sectionid = 0;
   var strand = 0;

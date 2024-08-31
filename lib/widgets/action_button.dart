@@ -208,32 +208,35 @@ class ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton.outlined(
-          onPressed: onPressed,
-          icon: Icon(
-            icon,
-            color: const Color.fromARGB(255, 133, 13, 22),
-          ),
-        ),
-        const SizedBox(height: 5),
-        SizedBox(
-          width: 68,
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton.outlined(
+            onPressed: onPressed,
+            icon: Icon(
+              icon,
+              color: const Color.fromARGB(255, 133, 13, 22),
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
-        )
-      ],
+          const SizedBox(height: 5),
+          SizedBox(
+            width: 68,
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          )
+        ],
+      ),
     );
   }
 }

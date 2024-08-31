@@ -95,73 +95,69 @@ class PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('PAYMENT',
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'PAYMENT',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,
               fontWeight: FontWeight.bold,
-            )),
-        centerTitle: true,
-      ),
-      body: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: null,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(10),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                child: Container(
-                  height: 40,
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Color.fromARGB(255, 133, 13, 22),
+            ),
+          ),
+          centerTitle: true,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(40),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              child: Container(
+                height: 30,
+                margin: EdgeInsets.only(left: 10, right: 10),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Color.fromARGB(255, 133, 13, 22),
+                ),
+                child: TabBar(
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicator: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: TabBar(
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    indicator: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    labelColor: Colors.black,
-                    unselectedLabelColor: Colors.white,
-                    labelStyle: TextStyle(fontSize: 12),
-                    tabs: const [
-                      Tab(text: 'Uploaded Payment'),
-                      Tab(text: 'Transactions'),
-                    ],
-                  ),
+                  labelColor: Colors.black,
+                  unselectedLabelColor: Colors.white,
+                  labelStyle: const TextStyle(fontSize: 12),
+                  tabs: const [
+                    Tab(text: 'Uploaded Payment'),
+                    Tab(text: 'Transactions'),
+                  ],
                 ),
               ),
             ),
           ),
-          body: TabBarView(
-            children: [
-              _buildUploadedPaymentTab(),
-              _buildTransactionsTab(),
-            ],
-          ),
-          floatingActionButton: ClipOval(
-            child: Material(
-              color: const Color.fromARGB(255, 133, 13, 22),
-              child: InkWell(
-                splashColor: const Color.fromARGB(255, 133, 13, 22),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PaymentForm()),
-                  );
-                },
-                child: const SizedBox(
-                  width: 56,
-                  height: 56,
-                  child: Icon(Icons.add, color: Colors.white),
-                ),
+        ),
+        body: TabBarView(
+          children: [
+            _buildUploadedPaymentTab(),
+            _buildTransactionsTab(),
+          ],
+        ),
+        floatingActionButton: ClipOval(
+          child: Material(
+            color: const Color.fromARGB(255, 133, 13, 22),
+            child: InkWell(
+              splashColor: const Color.fromARGB(255, 133, 13, 22),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaymentForm()),
+                );
+              },
+              child: const SizedBox(
+                width: 56,
+                height: 56,
+                child: Icon(Icons.add, color: Colors.white),
               ),
             ),
           ),
@@ -189,87 +185,96 @@ class PaymentPageState extends State<PaymentPage> {
           final double amountPaid = double.parse(payment.amount);
           final formattedAmount = amountFormat.format(amountPaid);
 
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 133, 13, 22),
-                  Color.fromARGB(255, 14, 19, 29),
-                ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+          return Card(
+            margin: const EdgeInsets.all(7.0),
+            color: Colors.white,
+            elevation: 5.0,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
             ),
-            margin: const EdgeInsets.all(5.0),
-            child: Card(
-              color: Colors.transparent,
-              elevation: 10.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          payment.description,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                        Text(
-                          'RN: ${payment.refNum}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: Colors.red,
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: ClipOval(
+                    child: payment.description == 'BANK'
+                        ? Container(
+                            color: Colors.grey[200],
+                            padding: EdgeInsets.all(10),
+                            child: Icon(
+                              Icons.account_balance,
+                              size: 40,
+                              color: Colors.black,
+                            ),
+                          )
+                        : Image.asset(
+                            payment.description == 'GCASH'
+                                ? 'assets/gcash.jpg'
+                                : 'assets/palawan.png',
+                            height: 45,
+                            width: 45,
+                            fit: BoxFit.cover,
                           ),
-                        ),
-                      ],
-                    ),
-                    // const SizedBox(height: 8.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           formattedDate,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 10),
                         ),
-                        Text(
-                          'Php $formattedAmount',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Colors.green,
-                          ),
+                        const SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              payment.description,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                            Text(
+                              'Php $formattedAmount',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'RN: ${payment.refNum}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              '(${payment.getStatus()})',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          '(${payment.getStatus()})',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           );
         },
@@ -292,9 +297,9 @@ class PaymentPageState extends State<PaymentPage> {
           final formattedAmount = amountFormat.format(amountPaid);
 
           return Card(
-            color: const Color.fromARGB(255, 14, 19, 29),
-            margin: const EdgeInsets.all(5.0),
-            elevation: 10.0,
+            color: Colors.white,
+            margin: const EdgeInsets.all(7.0),
+            elevation: 5.0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
             ),
@@ -304,18 +309,17 @@ class PaymentPageState extends State<PaymentPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${transaction.paytype} - OR#: ${transaction.ornum}',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
+                    formattedDate,
+                    style: const TextStyle(color: Colors.grey, fontSize: 10),
                   ),
                   const SizedBox(height: 8.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        formattedDate,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 12),
+                        '${transaction.paytype} - OR#: ${transaction.ornum}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                       Text(
                         'Php $formattedAmount',
