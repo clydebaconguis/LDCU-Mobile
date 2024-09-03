@@ -4,11 +4,13 @@ class Attendance {
   final int month;
   final int days;
   final String year;
+  final int semid;
   final int levelid;
   final String sydesc;
   final String sort;
+  final int isactive;
   final String monthdesc;
-  final String dates;
+  final List<String> dates;
   final int present;
   final int absent;
 
@@ -18,9 +20,11 @@ class Attendance {
     required this.month,
     required this.days,
     required this.year,
+    required this.semid,
     required this.levelid,
     required this.sydesc,
     required this.sort,
+    required this.isactive,
     required this.monthdesc,
     required this.dates,
     required this.present,
@@ -29,18 +33,20 @@ class Attendance {
 
   factory Attendance.fromJson(Map<String, dynamic> json) {
     return Attendance(
-      id: json['id'],
-      syid: json['syid'],
-      month: json['month'],
-      days: json['days'],
-      year: json['year'],
-      levelid: json['levelid'],
-      sydesc: json['sydesc'],
-      sort: json['sort'],
-      monthdesc: json['monthdesc'],
-      dates: json['dates'],
-      present: json['present'],
-      absent: json['absent'],
+      id: json['id'] ?? 0,
+      syid: json['syid'] ?? 0,
+      month: json['month'] ?? 0,
+      days: json['days'] ?? 0,
+      year: json['year'] ?? '',
+      semid: json['semid'] ?? 0,
+      levelid: json['levelid'] ?? 0,
+      sydesc: json['sydesc'] ?? '',
+      sort: json['sort'] ?? '',
+      isactive: json['isactive'] ?? 0,
+      monthdesc: json['monthdesc'] ?? '',
+      dates: List<String>.from(json['dates'] ?? []),
+      present: json['present'] ?? 0,
+      absent: json['absent'] ?? 0,
     );
   }
 
@@ -51,9 +57,11 @@ class Attendance {
       'month': month,
       'days': days,
       'year': year,
+      'semid': semid,
       'levelid': levelid,
       'sydesc': sydesc,
       'sort': sort,
+      'isactive': isactive,
       'monthdesc': monthdesc,
       'dates': dates,
       'present': present,
@@ -63,6 +71,6 @@ class Attendance {
 
   @override
   String toString() {
-    return 'Attendance(id: $id, syid: $syid, month: $month, days: $days, year: $year, levelid: $levelid, sydesc: $sydesc, sort: $sort, monthdesc: $monthdesc, dates: $dates, present: $present, absent: $absent)';
+    return 'Attendance(id: $id, syid: $syid, month: $month, days: $days, year: $year, semid: $semid, levelid: $levelid, sydesc: $sydesc, sort: $sort,isactive: $isactive, monthdesc: $monthdesc, dates: $dates, present: $present, absent: $absent)';
   }
 }

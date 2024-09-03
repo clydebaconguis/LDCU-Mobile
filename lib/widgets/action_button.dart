@@ -8,6 +8,7 @@ import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/enrollment_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/class_schedule.dart';
+import '../screens/class_schedule_college.dart';
 import '../screens/remedial_class.dart';
 import 'dart:convert';
 
@@ -61,11 +62,22 @@ class ActionButtonsState extends State<ActionButtons> {
               icon: Icons.calendar_month,
               label: 'Class\nSchedule',
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ClassScheduleScreen()),
-                );
+                EnrollmentInfo? latestInfo = getSelectedEnrollmentInfo();
+                if (latestInfo != null) {
+                  if (latestInfo.levelid >= 14) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ClassScheduleCollegeScreen()),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ClassScheduleScreen()),
+                    );
+                  }
+                }
               },
             ),
             ActionButton(

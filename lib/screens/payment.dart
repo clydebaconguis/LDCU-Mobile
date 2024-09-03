@@ -310,7 +310,6 @@ class PaymentPageState extends State<PaymentPage> {
                   child: ClipOval(
                     child: transaction.paytype == 'CASH'
                         ? Container(
-                            color: Colors.grey[200],
                             padding: EdgeInsets.all(10),
                             child: Icon(
                               Icons.payments,

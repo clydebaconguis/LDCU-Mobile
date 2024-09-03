@@ -135,7 +135,7 @@ class PushNotifications {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final json = preferences.getString('user');
     user = json == null ? UserData.myUser : User.fromJson(jsonDecode(json));
-    print('User data in push notifications: $user');
+    // print('User data in push notifications: $user');
 
     studid = user.id;
     userFirstName = user.firstname;
@@ -147,7 +147,7 @@ class PushNotifications {
     userLogin = json == null
         ? UserDataLogin.myUserLogin
         : Login.fromJson(jsonDecode(json));
-    print('User login data in push notifications: $userLogin');
+    // print('User login data in push notifications: $userLogin');
 
     type = userLogin.type;
   }

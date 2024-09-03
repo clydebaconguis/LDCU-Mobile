@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/grades.dart';
-import '../widgets/attendance.dart';
+import '../widgets/studentattendance.dart';
+import '../widgets/observedvalues.dart';
 
 class ReportCard extends StatefulWidget {
   const ReportCard({super.key});
@@ -71,7 +72,7 @@ class _ReportCardState extends State<ReportCard> {
             return Grades.fromJson(model);
           }).toList();
 
-          print(data);
+          // print(data);
         } else {
           data = gdList.map((model) {
             return Grades(
@@ -199,20 +200,6 @@ class _ReportCardState extends State<ReportCard> {
               _buildCoreValues(),
             ],
           ),
-          floatingActionButton: ClipOval(
-            child: Material(
-              color: Color.fromARGB(255, 133, 13, 22),
-              child: InkWell(
-                splashColor: Colors.red,
-                onTap: () {},
-                child: SizedBox(
-                  width: 56,
-                  height: 56,
-                  child: Icon(Icons.add, color: Colors.white),
-                ),
-              ),
-            ),
-          ),
         ),
       ),
     );
@@ -281,10 +268,7 @@ class _ReportCardState extends State<ReportCard> {
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey, width: 1),
-                    ),
+                    border: OutlineInputBorder(),
                   ),
                   isExpanded: true,
                   value: selectedSem,
@@ -304,7 +288,7 @@ class _ReportCardState extends State<ReportCard> {
                           semes,
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                       );
@@ -316,229 +300,247 @@ class _ReportCardState extends State<ReportCard> {
         const SizedBox(
           height: 20,
         ),
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: constraints.maxWidth,
-                  ),
-                  child: DataTable(
-                    columnSpacing: 30.0,
-                    columns: [
-                      const DataColumn(
-                          label: Text(
-                        'Subjects',
-                        style: TextStyle(
-                          fontSize: 11,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: constraints.maxWidth,
+                ),
+                child: DataTable(
+                  columnSpacing: 30.0,
+                  columns: [
+                    const DataColumn(
+                        label: Text(
+                      'Subjects',
+                      style: TextStyle(
+                        fontSize: 11,
+                      ),
+                    )),
+                    DataColumn(
+                      label: MergeSemantics(
+                        child: SizedBox(
+                          width: 112,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (gradelevel >= 17 || gradelevel == 0)
+                                const Text(
+                                  'Subject Description',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              if (gradelevel < 17 && gradelevel != 0)
+                                const Text(
+                                  'Periodic Ratings',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(fontSize: 11),
+                                ),
+                              if (gradelevel < 17 && gradelevel != 0)
+                                const Divider(
+                                  height: 5,
+                                  thickness: 1,
+                                  color: Colors.grey,
+                                ),
+                              if (gradelevel == 14 ||
+                                  gradelevel == 15 && gradelevel != 0)
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    if (semid == 1) const Text('Q1'),
+                                    if (semid == 1) const Text('Q2'),
+                                    if (semid == 2) const Text('Q3'),
+                                    if (semid == 2) const Text('Q4'),
+                                  ],
+                                ),
+                              if (gradelevel != 14 &&
+                                  gradelevel != 15 &&
+                                  gradelevel != 17 &&
+                                  gradelevel < 17 &&
+                                  gradelevel != 0)
+                                const Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text('Q1'),
+                                    Text('Q2'),
+                                    Text('Q3'),
+                                    Text('Q4'),
+                                  ],
+                                ),
+                            ],
+                          ),
                         ),
-                      )),
-                      DataColumn(
-                        label: MergeSemantics(
-                          child: SizedBox(
-                            width: 112,
-                            child: Column(
+                      ),
+                    ),
+                    const DataColumn(
+                      label: Expanded(
+                        child: Text(
+                          'Final\nRating',
+                          style: TextStyle(
+                            fontSize: 11,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ),
+                    ),
+                    const DataColumn(
+                      label: Expanded(
+                        child: Text(
+                          'Action \nTaken',
+                          style: TextStyle(
+                            fontSize: 11,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ),
+                    ),
+                  ],
+                  rows: concatenatedArray.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final grade = entry.value;
+                    final isEvenRow = index % 2 == 0;
+                    final rowColor =
+                        isEvenRow ? Colors.grey.shade200 : Colors.white;
+
+                    return DataRow(
+                        color:
+                            WidgetStateColor.resolveWith((states) => rowColor),
+                        cells: [
+                          DataCell(
+                            Container(
+                              width: 100,
+                              child: Text(
+                                grade.subjdesc,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Column(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                if (gradelevel >= 17 || gradelevel == 0)
-                                  const Text(
-                                    'Subject Description',
-                                    style: TextStyle(
-                                      fontSize: 11,
+                                if (gradelevel >= 17)
+                                  Container(
+                                    width: 100,
+                                    child: Text(
+                                      grade.subjdesc,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 3,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
                                   ),
-                                if (gradelevel < 17 && gradelevel != 0)
-                                  const Text(
-                                    'Periodic Ratings',
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(fontSize: 11),
-                                  ),
-                                if (gradelevel < 17 && gradelevel != 0)
-                                  const Divider(
-                                    height: 5,
-                                    thickness: 1,
-                                    color: Colors.grey,
-                                  ),
-                                if (gradelevel == 14 ||
-                                    gradelevel == 15 && gradelevel != 0)
+                                if (gradelevel == 14 || gradelevel == 15)
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      if (semid == 1) const Text('Q1'),
-                                      if (semid == 1) const Text('Q2'),
-                                      if (semid == 2) const Text('Q3'),
-                                      if (semid == 2) const Text('Q4'),
-                                    ],
-                                  ),
-                                if (gradelevel != 14 &&
-                                    gradelevel != 15 &&
-                                    gradelevel != 17 &&
-                                    gradelevel < 17 &&
-                                    gradelevel != 0)
-                                  const Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text('Q1'),
-                                      Text('Q2'),
-                                      Text('Q3'),
-                                      Text('Q4'),
-                                    ],
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            'Final\nRating',
-                            style: TextStyle(
-                              fontSize: 11,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
-                        ),
-                      ),
-                      const DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            'Action \nTaken',
-                            style: TextStyle(
-                              fontSize: 11,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
-                        ),
-                      ),
-                    ],
-                    rows: concatenatedArray.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final grade = entry.value;
-                      final isEvenRow = index % 2 == 0;
-                      final rowColor =
-                          isEvenRow ? Colors.grey.shade200 : Colors.white;
-
-                      return DataRow(
-                          color: WidgetStateColor.resolveWith(
-                              (states) => rowColor),
-                          cells: [
-                            DataCell(
-                              Container(
-                                width: 100,
-                                child: Text(
-                                  grade.subjdesc,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 3,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  if (gradelevel >= 17)
-                                    Container(
-                                      width: 100,
-                                      child: Text(
-                                        grade.subjdesc,
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 3,
-                                      ),
-                                    ),
-                                  if (gradelevel == 14 || gradelevel == 15)
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        if (semid == 1 && grade.q1 != "null")
-                                          Text(grade.q1),
-                                        if (semid == 1 && grade.q2 != "null")
-                                          Text(grade.q2),
-                                        if (semid == 2 && grade.q3 != "null")
-                                          Text(grade.q3),
-                                        if (semid == 2 && grade.q4 != "null")
-                                          Text(grade.q4),
-                                      ],
-                                    ),
-                                  if (gradelevel != 14 &&
-                                      gradelevel != 15 &&
-                                      gradelevel != 17 &&
-                                      gradelevel < 17)
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
+                                      if (semid == 1)
                                         Text(
                                           grade.q1 != "null" ? grade.q1 : '  ',
                                           style: TextStyle(
                                             fontSize: 11,
                                           ),
                                         ),
+                                      if (semid == 1)
                                         Text(
                                           grade.q2 != "null" ? grade.q2 : '  ',
                                           style: TextStyle(
                                             fontSize: 11,
                                           ),
                                         ),
+                                      if (semid == 2)
                                         Text(
                                           grade.q3 != "null" ? grade.q3 : '  ',
                                           style: TextStyle(
                                             fontSize: 11,
                                           ),
                                         ),
+                                      if (semid == 2)
                                         Text(
                                           grade.q4 != "null" ? grade.q4 : '  ',
                                           style: TextStyle(
                                             fontSize: 11,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                ],
+                                    ],
+                                  ),
+                                if (gradelevel != 14 &&
+                                    gradelevel != 15 &&
+                                    gradelevel != 17 &&
+                                    gradelevel < 17)
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                        grade.q1 != "null" ? grade.q1 : '  ',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      Text(
+                                        grade.q2 != "null" ? grade.q2 : '  ',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      Text(
+                                        grade.q3 != "null" ? grade.q3 : '  ',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      Text(
+                                        grade.q4 != "null" ? grade.q4 : '  ',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                          ),
+                          grade.finalrating != "null"
+                              ? DataCell(Text(
+                                  grade.finalrating,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                ))
+                              : const DataCell(Text('')),
+                          DataCell(
+                            Text(
+                              grade.actiontaken.toString().isNotEmpty
+                                  ? grade.actiontaken
+                                  : '',
+                              style: TextStyle(
+                                fontSize: 11,
                               ),
                             ),
-                            grade.finalrating != "null"
-                                ? DataCell(Text(
-                                    grade.finalrating,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                    ),
-                                  ))
-                                : const DataCell(Text('')),
-                            DataCell(
-                              Text(
-                                grade.actiontaken.toString().isNotEmpty
-                                    ? grade.actiontaken
-                                    : '',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                          ]);
-                    }).toList(),
-                  ),
+                          ),
+                        ]);
+                  }).toList(),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -547,13 +549,14 @@ class _ReportCardState extends State<ReportCard> {
   Widget _buildAttendance() {
     return Padding(
       padding: const EdgeInsets.all(30.0),
-      child: AttendanceScreen(),
+      child: StudentAttendanceScreen(),
     );
   }
 
   Widget _buildCoreValues() {
-    return Center(
-      child: Text('Core Values Content', style: TextStyle(fontSize: 18)),
+    return Padding(
+      padding: const EdgeInsets.all(30.0),
+      child: ObservedValuesScreen(),
     );
   }
 }
