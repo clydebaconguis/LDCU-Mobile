@@ -10,14 +10,16 @@ import 'package:pushtrial/models/schedule.dart';
 import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class ClassScheduleScreen extends StatefulWidget {
-  const ClassScheduleScreen({super.key});
+class ClassScheduleCollegeScreen extends StatefulWidget {
+  const ClassScheduleCollegeScreen({super.key});
 
   @override
-  State<ClassScheduleScreen> createState() => _ClassScheduleScreenState();
+  State<ClassScheduleCollegeScreen> createState() =>
+      _ClassScheduleCollegeScreenState();
 }
 
-class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
+class _ClassScheduleCollegeScreenState
+    extends State<ClassScheduleCollegeScreen> {
   User user = UserData.myUser;
   String id = '0';
   String selectedSem = '';
@@ -207,6 +209,19 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
     super.initState();
   }
 
+  Map<String, List<SchedItem>> _groupItemsByDay(List<SchedItem> items) {
+    Map<String, List<SchedItem>> groupedItems = {};
+
+    for (var item in items) {
+      if (!groupedItems.containsKey(item.month)) {
+        groupedItems[item.month] = [];
+      }
+      groupedItems[item.month]!.add(item);
+    }
+
+    return groupedItems;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,16 +249,63 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Container(
-                          height: 50,
+                        child: DropdownButtonFormField2<String>(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'School Year',
+                            labelStyle: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          isExpanded: true,
+                          hint: const Text(
+                            'Choose a school year',
+                            style:
+                                TextStyle(fontSize: 12, fontFamily: 'Poppins'),
+                          ),
+                          items: years
+                              .map((year) => DropdownMenuItem<String>(
+                                    value: year,
+                                    child: Text(
+                                      year,
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
+                          value: years.contains(selectedYear)
+                              ? selectedYear
+                              : null,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedYear = value ?? '';
+                              for (var yr in enInfoData) {
+                                if (yr.sydesc == selectedYear) {
+                                  syid = yr.syid;
+                                  sectionid = yr.sectionid;
+                                  levelid = yr.levelid;
+                                  selectedMonth = listOfItem2.isNotEmpty
+                                      ? listOfItem2[0].month
+                                      : '';
+                                  getStudSchedule(1);
+                                  break;
+                                }
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10.0),
+                      if (levelid == 14 || levelid == 15 || levelid >= 17) ...[
+                        Expanded(
                           child: DropdownButtonFormField2<String>(
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                    color: Colors.grey, width: 1),
-                              ),
-                              labelText: 'School Year',
+                              border: OutlineInputBorder(),
+                              labelText: 'Semester',
                               labelStyle: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 12,
@@ -252,15 +314,15 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                             ),
                             isExpanded: true,
                             hint: const Text(
-                              'Choose a school year',
+                              'Choose a semester',
                               style: TextStyle(
-                                  fontSize: 12, fontFamily: 'Poppins'),
+                                  fontSize: 14, fontFamily: 'Poppins'),
                             ),
-                            items: years
-                                .map((year) => DropdownMenuItem<String>(
-                                      value: year,
+                            items: semesters
+                                .map((semester) => DropdownMenuItem<String>(
+                                      value: semester,
                                       child: Text(
-                                        year,
+                                        semester,
                                         style: const TextStyle(
                                           fontFamily: 'Poppins',
                                           fontSize: 12,
@@ -268,21 +330,19 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                                       ),
                                     ))
                                 .toList(),
-                            value: years.contains(selectedYear)
-                                ? selectedYear
+                            value: semesters.contains(selectedSem)
+                                ? selectedSem
                                 : null,
-                            onChanged: (value) {
+                            onChanged: (String? newValue) {
                               setState(() {
-                                selectedYear = value ?? '';
-                                for (var yr in enInfoData) {
-                                  if (yr.sydesc == selectedYear) {
-                                    syid = yr.syid;
-                                    sectionid = yr.sectionid;
-                                    levelid = yr.levelid;
-                                    selectedMonth = listOfItem2.isNotEmpty
-                                        ? listOfItem2[0].month
-                                        : '';
-                                    getStudSchedule(1);
+                                selectedSem = newValue ?? '';
+                                for (var each in enInfoData) {
+                                  if (each.semester == newValue) {
+                                    semid = each.semid;
+                                    syid = each.syid;
+                                    sectionid = each.sectionid;
+                                    levelid = each.levelid;
+                                    getStudSchedule(each.semid);
                                     break;
                                   }
                                 }
@@ -290,69 +350,110 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                             },
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 10.0),
-                  if (levelid == 14 || levelid == 15 || levelid >= 17) ...[
-                    DropdownButtonFormField2<String>(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1),
-                        ),
-                        labelText: 'Semester',
-                        labelStyle: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      isExpanded: true,
-                      hint: const Text(
-                        'Choose a semester',
-                        style: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
-                      ),
-                      items: semesters
-                          .map((semester) => DropdownMenuItem<String>(
-                                value: semester,
-                                child: Text(
-                                  semester,
-                                  style: const TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ))
-                          .toList(),
-                      value:
-                          semesters.contains(selectedSem) ? selectedSem : null,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedSem = newValue ?? '';
-                          for (var each in enInfoData) {
-                            if (each.semester == newValue) {
-                              semid = each.semid;
-                              syid = each.syid;
-                              sectionid = each.sectionid;
-                              levelid = each.levelid;
-                              getStudSchedule(each.semid);
-                              break;
-                            }
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                  const SizedBox(height: 10.0),
+
+                  // Expanded(
+                  //   child: SingleChildScrollView(
+                  //     scrollDirection: Axis.vertical,
+                  //     child: Column(
+                  //       children:
+                  //           _groupItemsByDay(listOfItem2).entries.map((entry) {
+                  //         return Card(
+                  //           color: Colors.white,
+                  //           elevation: 2.0,
+                  //           child: Padding(
+                  //             padding: EdgeInsets.all(16.0),
+                  //             child: Column(
+                  //               crossAxisAlignment: CrossAxisAlignment.start,
+                  //               children: [
+                  //                 Text(
+                  //                   entry.key,
+                  //                   style: TextStyle(
+                  //                       fontFamily: 'Poppins',
+                  //                       fontSize: 16,
+                  //                       fontWeight: FontWeight.bold),
+                  //                 ),
+                  //                 SizedBox(height: 10.0),
+                  //                 ...entry.value.map((item) {
+                  //                   return Column(
+                  //                     crossAxisAlignment:
+                  //                         CrossAxisAlignment.start,
+                  //                     children: [
+                  //                       Text(
+                  //                         item.subject,
+                  //                         style: TextStyle(
+                  //                             fontFamily: 'Poppins',
+                  //                             fontSize: 14,
+                  //                             fontWeight: FontWeight.bold),
+                  //                         overflow: TextOverflow.clip,
+                  //                         maxLines: 2,
+                  //                       ),
+                  //                       SizedBox(height: 4.0),
+                  //                       if (item.room.isNotEmpty)
+                  //                         Row(
+                  //                           children: [
+                  //                             Icon(Icons.meeting_room,
+                  //                                 size: 16),
+                  //                             SizedBox(width: 8.0),
+                  //                             Text(
+                  //                               item.room,
+                  //                               style: TextStyle(
+                  //                                   fontFamily: 'Poppins',
+                  //                                   fontSize: 12,
+                  //                                   color: Colors.grey),
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       SizedBox(height: 4.0),
+                  //                       Row(
+                  //                         children: [
+                  //                           Icon(Icons.access_time, size: 16),
+                  //                           SizedBox(width: 8.0),
+                  //                           Text(
+                  //                             '${item.start} - ${item.end}',
+                  //                             style: TextStyle(
+                  //                               fontFamily: 'Poppins',
+                  //                               fontSize: 12,
+                  //                               color: Colors.grey,
+                  //                             ),
+                  //                           ),
+                  //                         ],
+                  //                       ),
+                  //                       SizedBox(height: 4.0),
+                  //                       if (item.teacher.isNotEmpty)
+                  //                         Row(
+                  //                           children: [
+                  //                             Icon(Icons.person, size: 16),
+                  //                             SizedBox(width: 8.0),
+                  //                             Text(
+                  //                               item.teacher,
+                  //                               style: TextStyle(
+                  //                                 fontFamily: 'Poppins',
+                  //                                 fontSize: 12,
+                  //                                 color: Colors.grey,
+                  //                               ),
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       SizedBox(height: 25.0),
+                  //                     ],
+                  //                   );
+                  //                 }).toList(),
+                  //               ],
+                  //             ),
+                  //           ),
+                  //         );
+                  //       }).toList(),
+                  //     ),
+                  //   ),
+                  // ),
+
                   DropdownButtonFormField2<String>(
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide:
-                            const BorderSide(color: Colors.grey, width: 1),
-                      ),
+                      border: OutlineInputBorder(),
                       labelText: 'Select Day',
                       labelStyle: TextStyle(
                         fontFamily: 'Poppins',
@@ -381,6 +482,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                             style: const TextStyle(
                               fontFamily: 'Poppins',
                               color: Colors.black,
+                              fontSize: 15,
                             ),
                           ),
                         );
@@ -502,6 +604,20 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                 ],
               ),
             ),
+      // floatingActionButton: ClipOval(
+      //   child: Material(
+      //     color: const Color.fromARGB(255, 133, 13, 22).withOpacity(0.8),
+      //     child: InkWell(
+      //       splashColor: const Color.fromARGB(255, 133, 13, 22),
+      //       onTap: () {},
+      //       child: const SizedBox(
+      //         width: 56,
+      //         height: 56,
+      //         child: Icon(Icons.print, color: Colors.white),
+      //       ),
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

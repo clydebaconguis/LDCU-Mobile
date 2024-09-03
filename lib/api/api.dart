@@ -3,9 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 class CallApi {
-  // final String _mainDomain = "https://app-ldcu.essentiel.ph/";
+  final String _mainDomain = "https://app-ldcu.essentiel.ph/";
   // final String _mainDomain = "http://127.0.0.1:8000/";
-  final String _mainDomain = "http://192.168.50.13:8000/";
+  // final String _mainDomain = "http://192.168.50.13:8000/";
   // final String _mainDomain = "https://assure.essentiel.ph/";
   final String _esDomain = "api/mobile/api_login";
   final String _enrollmentInfo = "api/mobile/api_enrollmentinfo";
@@ -31,10 +31,18 @@ class CallApi {
   final String _onlinePayments = "api/mobile/api_get_onlinepayments";
   final String _smsBunker = "api/mobile/api_get_smsbunker";
   final String _reportCardBE = "/api/mobile/api_enrollment_reportcard";
-  final String _studentAttendance = "api/mobile/api_attendance";
+  final String _studentAttendance = "/api/mobile/api_attendance";
+  final String _observedValues = "/api/mobile/api_observedvalues";
 
-  getStudentAttendance(studid, syid) async {
-    var fullUrl = '$_mainDomain$_studentAttendance?studid=$studid&syid=$syid';
+  getObservedValues(studid) async {
+    var fullUrl = '$_mainDomain$_observedValues?studid=$studid';
+    return await http.get(
+      Uri.parse(fullUrl),
+    );
+  }
+
+  getStudentAttendance(studid) async {
+    var fullUrl = '$_mainDomain$_studentAttendance?studid=$studid';
     return await http.get(
       Uri.parse(fullUrl),
     );
