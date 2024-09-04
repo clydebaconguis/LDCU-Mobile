@@ -11,6 +11,7 @@ import '../screens/class_schedule.dart';
 import '../screens/class_schedule_college.dart';
 import '../screens/remedial_class.dart';
 import 'dart:convert';
+import 'package:pushtrial/models/school_info.dart';
 
 class ActionButtons extends StatefulWidget {
   const ActionButtons({super.key});
@@ -39,11 +40,38 @@ class ActionButtonsState extends State<ActionButtons> {
   List<EnrollmentInfo> enInfoData = [];
   bool loading = true;
 
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getUser();
     getUserInfo();
+    getSchoolInfo();
   }
 
   @override
@@ -59,6 +87,7 @@ class ActionButtonsState extends State<ActionButtons> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ActionButton(
+              color: schoolColor,
               icon: Icons.calendar_month,
               label: 'Class\nSchedule',
               onPressed: () {
@@ -83,6 +112,7 @@ class ActionButtonsState extends State<ActionButtons> {
             ActionButton(
               icon: Icons.folder_open,
               label: 'Report\nCard',
+              color: schoolColor,
               onPressed: () {
                 EnrollmentInfo? latestInfo = getSelectedEnrollmentInfo();
                 if (latestInfo != null) {
@@ -104,6 +134,7 @@ class ActionButtonsState extends State<ActionButtons> {
             ActionButton(
               icon: Icons.folder_open,
               label: 'Remedial\nClass',
+              color: schoolColor,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -115,6 +146,7 @@ class ActionButtonsState extends State<ActionButtons> {
             ActionButton(
               icon: Icons.receipt_long,
               label: 'Billing\nInformation',
+              color: schoolColor,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -148,6 +180,7 @@ class ActionButtonsState extends State<ActionButtons> {
         semester: '',
         strandcode: '',
         courseabrv: '',
+        courseDesc: '',
       ),
     );
   }
@@ -203,6 +236,7 @@ class ActionButtonsState extends State<ActionButtons> {
                       semester: '',
                       strandcode: '',
                       courseabrv: '',
+                      courseDesc: '',
                     ));
         sem = latestInfo.semester;
       }
@@ -212,10 +246,15 @@ class ActionButtonsState extends State<ActionButtons> {
 
 class ActionButton extends StatelessWidget {
   const ActionButton(
-      {super.key, required this.icon, required this.label, this.onPressed});
+      {super.key,
+      required this.icon,
+      required this.label,
+      required this.color,
+      this.onPressed});
 
   final IconData icon;
   final String label;
+  final Color color;
   final void Function()? onPressed;
 
   @override
@@ -229,7 +268,7 @@ class ActionButton extends StatelessWidget {
             onPressed: onPressed,
             icon: Icon(
               icon,
-              color: const Color.fromARGB(255, 133, 13, 22),
+              color: color,
             ),
           ),
           const SizedBox(height: 5),

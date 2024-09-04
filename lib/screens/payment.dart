@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:pushtrial/models/onlinepayments.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -23,6 +24,32 @@ class PaymentPageState extends State<PaymentPage> {
   List<Transactions> trans = [];
   List<Payments> payments = [];
 
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +60,7 @@ class PaymentPageState extends State<PaymentPage> {
     await getUser();
     getTransactions();
     getOnlinePayments();
+    getSchoolInfo();
   }
 
   Future<void> getUser() async {
@@ -115,9 +143,9 @@ class PaymentPageState extends State<PaymentPage> {
               child: Container(
                 height: 30,
                 margin: EdgeInsets.only(left: 10, right: 10),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: Color.fromARGB(255, 133, 13, 22),
+                  color: schoolColor,
                 ),
                 child: TabBar(
                   indicatorSize: TabBarIndicatorSize.tab,
@@ -145,9 +173,9 @@ class PaymentPageState extends State<PaymentPage> {
         ),
         floatingActionButton: ClipOval(
           child: Material(
-            color: const Color.fromARGB(255, 133, 13, 22),
+            color: schoolColor,
             child: InkWell(
-              splashColor: const Color.fromARGB(255, 133, 13, 22),
+              splashColor: schoolColor,
               onTap: () {
                 Navigator.push(
                   context,

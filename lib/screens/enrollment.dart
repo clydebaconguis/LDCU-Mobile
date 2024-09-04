@@ -7,6 +7,7 @@ import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pushtrial/models/enrollment_data.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class EnrollmentScreen extends StatefulWidget {
   const EnrollmentScreen({super.key});
@@ -32,9 +33,10 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
   List<String> semesters = [];
   List<EnrollmentInfo> enInfoData = [];
   List<EnrollmentData> enData = [];
+  List<SchoolInfo> schoolInfo = [];
   String syDesc = '';
   String sem = '';
-
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
   bool loading = true;
 
   @override
@@ -42,6 +44,14 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
     super.initState();
     getUser();
     getUserInfo();
+    getSchoolInfo();
+  }
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
   }
 
   @override
@@ -59,7 +69,7 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 133, 13, 22),
+                color: schoolColor,
                 size: 100,
               ),
             )
@@ -70,7 +80,7 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
                   maxHeight: 250,
                 ),
                 child: Card(
-                  color: const Color.fromARGB(255, 133, 13, 22),
+                  color: schoolColor,
                   elevation: 4.0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
@@ -177,8 +187,25 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
         semester: '',
         strandcode: '',
         courseabrv: '',
+        courseDesc: '',
       ),
     );
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
   }
 
   Future<void> getUser() async {
@@ -233,6 +260,7 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
                       semester: '',
                       strandcode: '',
                       courseabrv: '',
+                      courseDesc: '',
                     ));
         sem = latestInfo.semester;
         syid = latestInfo.syid;

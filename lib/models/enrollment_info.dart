@@ -12,6 +12,7 @@ class EnrollmentInfo {
   final String semester;
   final String strandcode;
   final String courseabrv;
+  final String courseDesc;
 
   EnrollmentInfo({
     required this.levelid,
@@ -27,6 +28,7 @@ class EnrollmentInfo {
     required this.semester,
     required this.strandcode,
     required this.courseabrv,
+    required this.courseDesc,
   });
 
   factory EnrollmentInfo.fromJson(Map json) {
@@ -43,6 +45,7 @@ class EnrollmentInfo {
     var semester = json['semester'] ?? '';
     var strandcode = json['strandcode'] ?? '';
     var courseabrv = json['courseabrv'] ?? '';
+    var courseDesc = json['courseDesc'] ?? '';
     return EnrollmentInfo(
       syid: syid,
       sydesc: sydesc,
@@ -57,6 +60,7 @@ class EnrollmentInfo {
       semester: semester,
       strandcode: strandcode,
       courseabrv: courseabrv,
+      courseDesc: courseDesc,
     );
   }
 
@@ -75,11 +79,12 @@ class EnrollmentInfo {
       'semester': semester,
       'strandcode': strandcode,
       'courseabrv': courseabrv,
+      'courseDesc': courseDesc,
     };
   }
 
   @override
   String toString() {
-    return 'EnrollmentInfo(syid: $syid,sydesc: $sydesc,levelname: $levelname, sectionname: $sectionname, semid: $semid, dateenrolled: $dateenrolled, levelid: $levelid, sectionid: $sectionid, isactive: $isactive, strandid: $strandid, semester: $semester, strandcode: $strandcode, courseabrv: $courseabrv)';
+    return 'EnrollmentInfo(syid: $syid,sydesc: $sydesc,levelname: $levelname, sectionname: $sectionname, semid: $semid, dateenrolled: $dateenrolled, levelid: $levelid, sectionid: $sectionid, isactive: $isactive, strandid: $strandid, semester: $semester, strandcode: $strandcode, courseabrv: $courseabrv, courseDesc: $courseDesc)';
   }
 }

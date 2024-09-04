@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pushtrial/models/school_info.dart';
+import 'package:pushtrial/api/api.dart';
+import 'dart:convert';
 
 class CustomFloatingMenu extends StatefulWidget {
   @override
@@ -7,6 +10,32 @@ class CustomFloatingMenu extends StatefulWidget {
 
 class _CustomFloatingMenuState extends State<CustomFloatingMenu> {
   bool _isMenuOpen = false;
+
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
 
   void _toggleMenu() {
     setState(() {
@@ -39,6 +68,12 @@ class _CustomFloatingMenuState extends State<CustomFloatingMenu> {
       //   MaterialPageRoute(builder: (context) => PaymentPage()),
       // );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSchoolInfo();
   }
 
   @override
@@ -112,7 +147,7 @@ class _CustomFloatingMenuState extends State<CustomFloatingMenu> {
               _isMenuOpen ? Icons.close : Icons.menu,
               color: Colors.white,
             ),
-            backgroundColor: Color.fromARGB(255, 133, 13, 22),
+            backgroundColor: schoolColor,
             shape: CircleBorder(),
           ),
         ),
@@ -133,7 +168,7 @@ class _CustomFloatingMenuState extends State<CustomFloatingMenu> {
             children: [
               CircleAvatar(
                 radius: 30.0,
-                backgroundColor: Color.fromARGB(255, 133, 13, 22),
+                backgroundColor: schoolColor,
                 child: Icon(
                   iconData[index],
                   color: Colors.white,

@@ -9,6 +9,7 @@ import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class NotificationsScreen extends StatefulWidget {
   // final VoidCallback onNotificationsViewed;
@@ -24,12 +25,38 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Login userLogin = UserDataLogin.myUserLogin;
   int studid = 0;
   int type = 0;
-  // List<TapHistory> data = [];
   List<SMS> sms = [];
   bool loading = true;
 
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
+
   @override
   void initState() {
+    getSchoolInfo();
     super.initState();
     _initializeData();
   }
@@ -65,30 +92,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     type = userLogin.type;
   }
-
-  // Future<void> getSMSBunker() async {
-  //   try {
-  //     final response = await CallApi().getSmsBunker(studid);
-
-  //     if (response.statusCode == 200) {
-  //       if (response.body.isEmpty) {
-  //         print('No data returned');
-  //         return;
-  //       }
-
-  //       Iterable list = json.decode(response.body);
-  //       setState(() {
-  //         sms = list.map((model) => SMS.fromJson(model)).toList();
-  //       });
-
-  //       // print('Retrieved smsbunker for notifications: $sms');
-  //     } else {
-  //       print('Failed to load smsnbunker. Status code: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print('Exception occurred: $e');
-  //   }
-  // }
 
   Future<void> getSMSBunker() async {
     try {
@@ -177,19 +180,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NOTIFICATIONS',
+        title: Text('NOTIFICATIONS',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 133, 13, 22),
+              color: schoolColor,
             )),
         centerTitle: true,
       ),
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 133, 13, 22),
+                color: schoolColor,
                 size: 100,
               ),
             )

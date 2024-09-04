@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/enrollment_info.dart';
-
+import 'package:pushtrial/models/school_info.dart';
 import 'package:pushtrial/models/schedule.dart';
 import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -38,8 +38,33 @@ class _ClassScheduleCollegeScreenState
   List<SchedItem> listOfItem2 = [];
   List<SchedItem> listOfItem3 = [];
   List<EnrollmentInfo> enInfoData = [];
-
   bool loading = true;
+
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
 
   getSchedByMonth() {
     Set<String> uniqueSet = months.toSet();
@@ -151,7 +176,7 @@ class _ClassScheduleCollegeScreenState
           if (yr.sydesc == selectedYear) {
             setState(() {
               syid = yr.syid;
-              semid = 1;
+              semid = yr.semid;
               sectionid = yr.sectionid;
               levelid = yr.levelid;
             });
@@ -199,6 +224,7 @@ class _ClassScheduleCollegeScreenState
         semester: '',
         strandcode: '',
         courseabrv: '',
+        courseDesc: '',
       ),
     );
   }
@@ -206,6 +232,7 @@ class _ClassScheduleCollegeScreenState
   @override
   void initState() {
     getUser();
+    getSchoolInfo();
     super.initState();
   }
 
@@ -237,12 +264,13 @@ class _ClassScheduleCollegeScreenState
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 133, 13, 22),
+                color: schoolColor,
                 size: 100,
               ),
             )
           : Padding(
-              padding: const EdgeInsets.all(30.0),
+              padding:
+                  const EdgeInsets.only(left: 30.0, right: 30.0, bottom: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -251,7 +279,7 @@ class _ClassScheduleCollegeScreenState
                       Expanded(
                         child: DropdownButtonFormField2<String>(
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(),
+                            // border: OutlineInputBorder(),
                             labelText: 'School Year',
                             labelStyle: TextStyle(
                               fontFamily: 'Poppins',
@@ -304,8 +332,8 @@ class _ClassScheduleCollegeScreenState
                         Expanded(
                           child: DropdownButtonFormField2<String>(
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Semester',
+                              // border: OutlineInputBorder(),
+                              labelText: '',
                               labelStyle: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 12,
@@ -325,7 +353,7 @@ class _ClassScheduleCollegeScreenState
                                         semester,
                                         style: const TextStyle(
                                           fontFamily: 'Poppins',
-                                          fontSize: 12,
+                                          fontSize: 11,
                                         ),
                                       ),
                                     ))
@@ -353,7 +381,7 @@ class _ClassScheduleCollegeScreenState
                       ],
                     ],
                   ),
-                  const SizedBox(height: 10.0),
+                  const SizedBox(height: 20.0),
 
                   // Expanded(
                   //   child: SingleChildScrollView(
@@ -453,7 +481,7 @@ class _ClassScheduleCollegeScreenState
 
                   DropdownButtonFormField2<String>(
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      // border: OutlineInputBorder(),
                       labelText: 'Select Day',
                       labelStyle: TextStyle(
                         fontFamily: 'Poppins',
@@ -508,7 +536,7 @@ class _ClassScheduleCollegeScreenState
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(10.0),
-                                  color: const Color.fromARGB(255, 133, 13, 22),
+                                  color: schoolColor,
                                   child: Row(
                                     children: [
                                       Expanded(

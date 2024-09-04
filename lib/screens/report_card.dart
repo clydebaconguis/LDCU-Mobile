@@ -7,6 +7,7 @@ import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/grades.dart';
 import '../widgets/studentattendance.dart';
 import '../widgets/observedvalues.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class ReportCard extends StatefulWidget {
   const ReportCard({super.key});
@@ -19,6 +20,7 @@ class _ReportCardState extends State<ReportCard> {
   Color mainClr = Colors.white;
   @override
   void initState() {
+    getSchoolInfo();
     getUser();
     super.initState();
   }
@@ -38,6 +40,32 @@ class _ReportCardState extends State<ReportCard> {
   List<Grades> finalGrade = [];
   List<EnrollmentInfo> enInfoData = [];
   List<Grades> concatenatedArray = [];
+
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = const Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
 
   Future<void> getUser() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -186,18 +214,18 @@ class _ReportCardState extends State<ReportCard> {
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: const Color.fromARGB(255, 133, 13, 22),
+                    color: schoolColor,
                   ),
                   child: TabBar(
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: BoxDecoration(
-                      color: Color.fromARGB(255, 219, 154, 149),
+                      color: const Color.fromARGB(255, 219, 154, 149),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelColor: Colors.black,
                     unselectedLabelColor: Colors.white,
-                    labelStyle: TextStyle(fontSize: 12),
-                    tabs: [
+                    labelStyle: const TextStyle(fontSize: 12),
+                    tabs: const [
                       Tab(text: 'Grades'),
                       Tab(text: 'Attendance'),
                       Tab(text: 'Core Values'),
@@ -223,60 +251,107 @@ class _ReportCardState extends State<ReportCard> {
     return ListView(
       padding: const EdgeInsets.all(30),
       children: [
-        selectedYear.isNotEmpty
-            ? DropdownButtonFormField2<String>(
-                decoration: InputDecoration(
-                  labelText: 'School Year',
-                  labelStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-                isExpanded: true,
-                hint: Text(
-                  'Choose a school year',
-                  style: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
-                ),
-                value: selectedYear,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedYear = newValue!;
-                    for (var yr in enInfoData) {
-                      if (yr.sydesc == selectedYear) {
-                        syid = yr.syid;
-                        selectedSem = sem[0];
-                        gradelevel = yr.levelid;
-                        sectionid = yr.sectionid;
-                        strand = yr.strandid;
-                        getGrades(yr.semid);
-                      }
-                    }
-                  });
-                },
-                items: years.map<DropdownMenuItem<String>>(
-                  (String year) {
-                    return DropdownMenuItem<String>(
-                      value: year,
-                      child: Text(
-                        year,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 12,
+        if (gradelevel >= 14) ...[
+          Row(
+            children: [
+              Expanded(
+                child: selectedYear.isNotEmpty
+                    ? DropdownButtonFormField2<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'School Year',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          border: OutlineInputBorder(),
                         ),
-                      ),
-                    );
-                  },
-                ).toList(),
-              )
-            : const CircularProgressIndicator(),
-        if (gradelevel == 14 || gradelevel == 15 || gradelevel >= 17) ...[
-          SizedBox(height: 10.0),
-          selectedSem.isNotEmpty
+                        isExpanded: true,
+                        hint: const Text(
+                          'Choose a school year',
+                          style: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
+                        ),
+                        value: selectedYear,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedYear = newValue!;
+                            for (var yr in enInfoData) {
+                              if (yr.sydesc == selectedYear) {
+                                syid = yr.syid;
+                                selectedSem = sem[0];
+                                gradelevel = yr.levelid;
+                                sectionid = yr.sectionid;
+                                strand = yr.strandid;
+                                getGrades(yr.semid);
+                              }
+                            }
+                          });
+                        },
+                        items: years.map<DropdownMenuItem<String>>(
+                          (String year) {
+                            return DropdownMenuItem<String>(
+                              value: year,
+                              child: Text(
+                                year,
+                                style: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 12,
+                                ),
+                              ),
+                            );
+                          },
+                        ).toList(),
+                      )
+                    : const CircularProgressIndicator(),
+              ),
+              const SizedBox(width: 10.0),
+              Expanded(
+                child: selectedSem.isNotEmpty
+                    ? DropdownButtonFormField2<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Semester',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          border: OutlineInputBorder(),
+                        ),
+                        isExpanded: true,
+                        value: selectedSem,
+                        hint: const Text('Select Sem'),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedSem = newValue!;
+                            var index = sem.indexOf(selectedSem) + 1;
+                            getGrades(index);
+                          });
+                        },
+                        items: sem.map<DropdownMenuItem<String>>(
+                          (String semes) {
+                            return DropdownMenuItem<String>(
+                              value: semes,
+                              child: Text(
+                                semes,
+                                style: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 10,
+                                ),
+                              ),
+                            );
+                          },
+                        ).toList(),
+                      )
+                    : const CircularProgressIndicator(),
+              ),
+            ],
+          ),
+        ],
+        if (gradelevel < 14) ...[
+          selectedYear.isNotEmpty
               ? DropdownButtonFormField2<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Semester',
+                  decoration: const InputDecoration(
+                    labelText: 'School Year',
                     labelStyle: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 12,
@@ -285,22 +360,33 @@ class _ReportCardState extends State<ReportCard> {
                     border: OutlineInputBorder(),
                   ),
                   isExpanded: true,
-                  value: selectedSem,
-                  hint: const Text('Select Sem'),
+                  hint: const Text(
+                    'Choose a school year',
+                    style: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
+                  ),
+                  value: selectedYear,
                   onChanged: (String? newValue) {
                     setState(() {
-                      selectedSem = newValue!;
-                      var index = sem.indexOf(selectedSem) + 1;
-                      getGrades(index);
+                      selectedYear = newValue!;
+                      for (var yr in enInfoData) {
+                        if (yr.sydesc == selectedYear) {
+                          syid = yr.syid;
+                          selectedSem = sem[0];
+                          gradelevel = yr.levelid;
+                          sectionid = yr.sectionid;
+                          strand = yr.strandid;
+                          getGrades(yr.semid);
+                        }
+                      }
                     });
                   },
-                  items: sem.map<DropdownMenuItem<String>>(
-                    (String semes) {
+                  items: years.map<DropdownMenuItem<String>>(
+                    (String year) {
                       return DropdownMenuItem<String>(
-                        value: semes,
+                        value: year,
                         child: Text(
-                          semes,
-                          style: TextStyle(
+                          year,
+                          style: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
                           ),
@@ -431,10 +517,10 @@ class _ReportCardState extends State<ReportCard> {
                         cells: [
                           DataCell(
                             Container(
-                              width: 100,
+                              width: 250,
                               child: Text(
                                 grade.subjdesc,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -452,7 +538,7 @@ class _ReportCardState extends State<ReportCard> {
                                     width: 100,
                                     child: Text(
                                       grade.subjdesc,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 10,
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -467,28 +553,28 @@ class _ReportCardState extends State<ReportCard> {
                                       if (semid == 1)
                                         Text(
                                           grade.q1 != "null" ? grade.q1 : '  ',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 11,
                                           ),
                                         ),
                                       if (semid == 1)
                                         Text(
                                           grade.q2 != "null" ? grade.q2 : '  ',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 11,
                                           ),
                                         ),
                                       if (semid == 2)
                                         Text(
                                           grade.q3 != "null" ? grade.q3 : '  ',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 11,
                                           ),
                                         ),
                                       if (semid == 2)
                                         Text(
                                           grade.q4 != "null" ? grade.q4 : '  ',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 11,
                                           ),
                                         ),
@@ -504,25 +590,25 @@ class _ReportCardState extends State<ReportCard> {
                                     children: [
                                       Text(
                                         grade.q1 != "null" ? grade.q1 : '  ',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 11,
                                         ),
                                       ),
                                       Text(
                                         grade.q2 != "null" ? grade.q2 : '  ',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 11,
                                         ),
                                       ),
                                       Text(
                                         grade.q3 != "null" ? grade.q3 : '  ',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 11,
                                         ),
                                       ),
                                       Text(
                                         grade.q4 != "null" ? grade.q4 : '  ',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 11,
                                         ),
                                       ),
@@ -534,7 +620,7 @@ class _ReportCardState extends State<ReportCard> {
                           grade.finalrating != "null"
                               ? DataCell(Text(
                                   grade.finalrating,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 11,
                                   ),
                                 ))
@@ -544,7 +630,7 @@ class _ReportCardState extends State<ReportCard> {
                               grade.actiontaken.toString().isNotEmpty
                                   ? grade.actiontaken
                                   : '',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 11,
                               ),
                             ),
@@ -561,15 +647,15 @@ class _ReportCardState extends State<ReportCard> {
   }
 
   Widget _buildAttendance() {
-    return Padding(
-      padding: const EdgeInsets.all(30.0),
+    return const Padding(
+      padding: EdgeInsets.all(30.0),
       child: StudentAttendanceScreen(),
     );
   }
 
   Widget _buildCoreValues() {
-    return Padding(
-      padding: const EdgeInsets.all(30.0),
+    return const Padding(
+      padding: EdgeInsets.all(30.0),
       child: ObservedValuesScreen(),
     );
   }

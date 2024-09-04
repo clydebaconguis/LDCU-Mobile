@@ -4,6 +4,7 @@ import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/enrollment_info.dart';
 import 'package:pushtrial/models/ledger.dart';
 import 'dart:convert';
+import 'package:pushtrial/models/school_info.dart';
 
 class CreditCard extends StatefulWidget {
   const CreditCard({super.key});
@@ -24,10 +25,37 @@ class _CreditCardState extends State<CreditCard> {
   String sem = '';
   String totalBalance = 'Php 0.00';
 
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getUser();
+    getSchoolInfo();
   }
 
   @override
@@ -88,7 +116,7 @@ class _CreditCardState extends State<CreditCard> {
             Expanded(
               flex: 1,
               child: Container(
-                color: const Color.fromARGB(255, 133, 13, 22),
+                color: schoolColor,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(

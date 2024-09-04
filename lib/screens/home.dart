@@ -20,6 +20,8 @@ import 'package:pushtrial/models/login.dart';
 import 'package:pushtrial/models/user_login.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'scholarship_request.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -45,6 +47,31 @@ class _HomeScreenState extends State<HomeScreen>
   List<SMS> sms = [];
   Login userLogin = UserDataLogin.myUserLogin;
   int type = 0;
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -60,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen>
     await getUser();
     await getLogin();
     await getSMSBunker();
+    getSchoolInfo();
   }
 
   Future<void> getLogin() async {
@@ -238,9 +266,9 @@ class _HomeScreenState extends State<HomeScreen>
     final user = widget.user;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 133, 13, 22),
+      backgroundColor: schoolColor,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 133, 13, 22),
+        backgroundColor: schoolColor,
         leading: IconButton(
           icon: Image.asset('assets/app_icon.png'),
           color: Colors.white,
@@ -375,13 +403,13 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       );
                     },
-                    child: const Center(
+                    child: Center(
                       child: Text(
                         'View All Notifications',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
-                          color: Color.fromARGB(255, 109, 17, 10),
+                          color: schoolColor,
                         ),
                       ),
                     ),
@@ -432,6 +460,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     color: Colors.white,
                                     fontSize: 22,
                                     fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
                                   ),
                                   overflow: TextOverflow.visible,
                                   maxLines: 1,
@@ -448,23 +477,34 @@ class _HomeScreenState extends State<HomeScreen>
                           Container(
                             margin: const EdgeInsets.only(top: 100.0),
                             color: Colors.white,
-                            child: Column(
-                              children: [
-                                Expanded(child: Container()),
-                                const Center(
-                                  child: ActionButtons(),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: TabCard(),
-                                ),
-                              ],
-                            ),
+                            // child: Column(
+                            //   children: [
+                            //     Expanded(child: Container()),
+                            //     const Center(
+                            //       child: ActionButtons(),
+                            //     ),
+                            //     const Padding(
+                            //       padding: EdgeInsets.all(8.0),
+                            //       child: TabCard(),
+                            //     ),
+                            //   ],
+                            // ),
                           ),
                           const Positioned(
                             left: 25,
                             right: 25,
                             child: CreditCard(),
+                          ),
+                          Column(
+                            children: [
+                              Expanded(child: Container()),
+                              const Center(
+                                child: ActionButtons(),
+                              ),
+                              const Center(
+                                child: TabCard(),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -490,7 +530,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
                 shape: const CircleBorder(),
-                backgroundColor: const Color.fromARGB(255, 133, 13, 22),
+                backgroundColor: schoolColor,
               ),
             ),
           ),
@@ -555,9 +595,9 @@ class _HomeScreenState extends State<HomeScreen>
                 child: Container(
                   width: 60.0,
                   height: 60.0,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color.fromARGB(255, 133, 13, 22),
+                    color: schoolColor,
                   ),
                   child: IconButton(
                     icon: const Icon(
@@ -610,6 +650,12 @@ class _HomeScreenState extends State<HomeScreen>
                     onPressed: () {
                       Navigator.pop(context);
                       if (labels[index] == 'Scholarship Request') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ScholarshipRequestScreen()),
+                        );
                       } else if (labels[index] == 'School Calendar') {
                         Navigator.push(
                           context,
@@ -653,7 +699,7 @@ class _HomeScreenState extends State<HomeScreen>
       children: [
         CircleAvatar(
           radius: 30.0,
-          backgroundColor: const Color.fromARGB(255, 133, 13, 22),
+          backgroundColor: schoolColor,
           child: IconButton(
             icon: Icon(icon),
             color: Colors.white,

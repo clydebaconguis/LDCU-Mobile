@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/grades.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:pushtrial/models/payments.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class ReportCardCollege extends StatefulWidget {
   const ReportCardCollege({super.key});
@@ -20,6 +20,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
   @override
   void initState() {
     getUser();
+    getSchoolInfo();
     super.initState();
   }
 
@@ -31,14 +32,41 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
   var sectionid = 0;
   var strand = 0;
   String selectedYear = '';
-  String selectedSem = '1st Sem';
+  String selectedSem = '';
   List<String> years = [];
+  List<String> semesters = [];
   List<String> sem = ['1st Sem', '2nd Sem'];
   List<Grades> data = [];
   List<Grades> finalGrade = [];
   List<EnrollmentInfo> enInfoData = [];
   List<Grades> concatenatedArray = [];
   bool loading = true;
+
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
 
   Future<void> getUser() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -136,6 +164,41 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
     });
   }
 
+  // getEnrollment() async {
+  //   await CallApi().getEnrollmentInfo(id).then((response) {
+  //     setState(() {
+  //       Iterable list = json.decode(response.body);
+
+  //       enInfoData = list.map((model) {
+  //         return EnrollmentInfo.fromJson(model);
+  //       }).toList();
+
+  //       for (var element in enInfoData) {
+  //         years.add(element.sydesc);
+  //         semesters.add(element.semester);
+  //       }
+  //       Set<String> uniqueSet = years.toSet();
+  //       years = uniqueSet.toList();
+
+  //       selectedYear = enInfoData[enInfoData.length - 1].sydesc;
+  //       selectedSem = semesters.isNotEmpty ? semesters[0] : '';
+  //       var lastindex = enInfoData[enInfoData.length - 1];
+
+  //       setState(() {
+  //         syid = lastindex.syid;
+  //         semid = lastindex.semid;
+  //         gradelevel = lastindex.levelid;
+  //         sectionid = lastindex.sectionid;
+  //         strand = lastindex.strandid;
+  //         selectedSem = lastindex.semester;
+  //       });
+  //       getGrades(1);
+
+  //       print('enInfoData: $enInfoData');
+  //     });
+  //   });
+  // }
+
   getEnrollment() async {
     await CallApi().getEnrollmentInfo(id).then((response) {
       setState(() {
@@ -147,23 +210,24 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
 
         for (var element in enInfoData) {
           years.add(element.sydesc);
+          semesters.add(element.semester);
         }
         Set<String> uniqueSet = years.toSet();
         years = uniqueSet.toList();
-
         selectedYear = enInfoData[enInfoData.length - 1].sydesc;
-        var lastindex = enInfoData[enInfoData.length - 1];
-
-        setState(() {
-          syid = lastindex.syid;
-          semid = lastindex.semid;
-          gradelevel = lastindex.levelid;
-          sectionid = lastindex.sectionid;
-          strand = lastindex.strandid;
-        });
-        getGrades(1);
-
-        print('enInfoData: $enInfoData');
+        selectedSem = semesters.isNotEmpty ? semesters[0] : '';
+        for (var yr in enInfoData) {
+          if (yr.sydesc == selectedYear) {
+            setState(() {
+              syid = yr.syid;
+              semid = yr.semid;
+              gradelevel = yr.levelid;
+              sectionid = yr.sectionid;
+            });
+            getGrades(1);
+            break;
+          }
+        }
       });
     });
   }
@@ -183,12 +247,12 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 133, 13, 22),
+                color: schoolColor,
                 size: 100,
               ),
             )
           : ListView(
-              padding: const EdgeInsets.all(30),
+              padding: const EdgeInsets.all(20),
               children: [
                 Row(
                   children: [
@@ -208,7 +272,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                               hint: Text(
                                 'Choose a school year',
                                 style: TextStyle(
-                                    fontSize: 14, fontFamily: 'Poppins'),
+                                    fontSize: 11, fontFamily: 'Poppins'),
                               ),
                               value: selectedYear,
                               onChanged: (String? newValue) {
@@ -217,7 +281,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                                   for (var yr in enInfoData) {
                                     if (yr.sydesc == selectedYear) {
                                       syid = yr.syid;
-                                      selectedSem = sem[0];
+                                      selectedSem = yr.semester;
                                       gradelevel = yr.levelid;
                                       sectionid = yr.sectionid;
                                       strand = yr.strandid;
@@ -234,7 +298,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                                       year,
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
-                                        fontSize: 12,
+                                        fontSize: 11,
                                       ),
                                     ),
                                   );
@@ -249,40 +313,87 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                         gradelevel >= 17)
                       Expanded(
                         child: selectedSem.isNotEmpty
+                            // ? DropdownButtonFormField2<String>(
+                            //     decoration: InputDecoration(
+                            //       labelText: 'Semester',
+                            //       labelStyle: TextStyle(
+                            //         fontFamily: 'Poppins',
+                            //         fontSize: 12,
+                            //         fontWeight: FontWeight.w500,
+                            //       ),
+                            //       border: OutlineInputBorder(),
+                            //     ),
+                            //     isExpanded: true,
+                            //     value: selectedSem,
+                            //     hint: const Text('Select Sem'),
+                            //     onChanged: (String? newValue) {
+                            //       setState(() {
+                            //         selectedSem = newValue!;
+                            //         var index = sem.indexOf(selectedSem) + 1;
+                            //         getGrades(index);
+                            //       });
+                            //     },
+                            //     items: sem.map<DropdownMenuItem<String>>(
+                            //       (String semes) {
+                            //         return DropdownMenuItem<String>(
+                            //           value: semes,
+                            //           child: Text(
+                            //             semes,
+                            //             style: TextStyle(
+                            //               fontFamily: 'Poppins',
+                            //               fontSize: 12,
+                            //             ),
+                            //           ),
+                            //         );
+                            //       },
+                            //     ).toList(),
+                            //   )
+                            // : const CircularProgressIndicator(),
+
                             ? DropdownButtonFormField2<String>(
                                 decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
                                   labelText: 'Semester',
                                   labelStyle: TextStyle(
                                     fontFamily: 'Poppins',
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
-                                  border: OutlineInputBorder(),
                                 ),
                                 isExpanded: true,
-                                value: selectedSem,
-                                hint: const Text('Select Sem'),
+                                hint: const Text(
+                                  'Choose a semester',
+                                  style: TextStyle(
+                                      fontSize: 11, fontFamily: 'Poppins'),
+                                ),
+                                items: semesters
+                                    .map((semester) => DropdownMenuItem<String>(
+                                          value: semester,
+                                          child: Text(
+                                            semester,
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                                value: semesters.contains(selectedSem)
+                                    ? selectedSem
+                                    : null,
                                 onChanged: (String? newValue) {
                                   setState(() {
-                                    selectedSem = newValue!;
-                                    var index = sem.indexOf(selectedSem) + 1;
-                                    getGrades(index);
+                                    selectedSem = newValue ?? '';
+                                    for (var each in enInfoData) {
+                                      if (each.semester == newValue) {
+                                        semid = each.semid;
+                                        syid = each.syid;
+                                        getGrades(each.semid);
+                                        break;
+                                      }
+                                    }
                                   });
                                 },
-                                items: sem.map<DropdownMenuItem<String>>(
-                                  (String semes) {
-                                    return DropdownMenuItem<String>(
-                                      value: semes,
-                                      child: Text(
-                                        semes,
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins',
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ).toList(),
                               )
                             : const CircularProgressIndicator(),
                       ),
@@ -393,7 +504,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                             const DataColumn(
                               label: Expanded(
                                 child: Text(
-                                  'Action \nTaken',
+                                  'Remarks',
                                   style: TextStyle(
                                     fontSize: 11,
                                   ),

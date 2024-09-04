@@ -11,6 +11,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
+import 'package:pushtrial/models/school_info.dart';
 // import 'package:image/image.dart' as img;
 // import 'package:file_picker/file_picker.dart';
 // import 'package:http/http.dart' as http;
@@ -35,6 +36,8 @@ class _PaymentFormState extends State<PaymentForm> {
   Uint8List? _receiptImageBytes;
   File? _receiptImageFile;
   bool loading = true;
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
 
   final List<String> _messageReceiverOptions = [
     'Student',
@@ -73,6 +76,29 @@ class _PaymentFormState extends State<PaymentForm> {
   final TextEditingController _contactNumberController =
       TextEditingController();
 
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +112,7 @@ class _PaymentFormState extends State<PaymentForm> {
 
     await getUser();
     await getOnlinePayments();
+    getSchoolInfo();
 
     setState(() {
       loading = false;
@@ -182,7 +209,7 @@ class _PaymentFormState extends State<PaymentForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please fill in all required fields.'),
-          backgroundColor: Color.fromARGB(255, 133, 13, 22),
+          backgroundColor: schoolColor,
         ),
       );
       return;
@@ -233,7 +260,7 @@ class _PaymentFormState extends State<PaymentForm> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Reference Number already exists.'),
-                backgroundColor: Color.fromARGB(255, 133, 13, 22),
+                backgroundColor: schoolColor,
               ),
             );
           } else {
@@ -280,7 +307,7 @@ class _PaymentFormState extends State<PaymentForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to submit payment: $responseString'),
-            backgroundColor: Color.fromARGB(255, 133, 13, 22),
+            backgroundColor: schoolColor,
           ),
         );
       }
@@ -289,7 +316,7 @@ class _PaymentFormState extends State<PaymentForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('An error occurred. Please try again later.'),
-          backgroundColor: Color.fromARGB(255, 133, 13, 22),
+          backgroundColor: schoolColor,
         ),
       );
     } finally {
@@ -299,145 +326,6 @@ class _PaymentFormState extends State<PaymentForm> {
       });
     }
   }
-
-  // Future<void> _submitForm() async {
-  //   if (_selectedPaymentType == null ||
-  //       _transactionDateController.text.isEmpty ||
-  //       _referenceNumberController.text.isEmpty ||
-  //       _paymentAmountController.text.isEmpty ||
-  //       _messageReceiverController.text.isEmpty ||
-  //       _contactNumberController.text.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Please fill in all required fields.'),
-  //         backgroundColor: Color.fromARGB(255, 133, 13, 22),
-  //       ),
-  //     );
-  //     return;
-  //   }
-
-  //   setState(() {
-  //     loading = true;
-  //   });
-
-  //   try {
-  //     String amount = _paymentAmountController.text;
-  //     String transDate = _transactionDateController.text;
-  //     String refNum = _referenceNumberController.text;
-  //     String opcontact = _contactNumberController.text;
-  //     String syid =
-  //         _syOptions.firstWhere((sy) => sy.sydesc == _selectedSY).id.toString();
-  //     String semid = _semesterOptions
-  //         .firstWhere((sem) => sem.semester == _selectedSem)
-  //         .id
-  //         .toString();
-
-  //     String? paymentType = _paymentOptions
-  //         .firstWhere((option) => option.description == _selectedPaymentType)
-  //         .id
-  //         .toString();
-
-  //     // var request = http.MultipartRequest('POST',
-  //     //     Uri.parse('http://192.168.50.13:8000/api/mobile/api_send_payment/'));
-
-  //     var request = http.MultipartRequest(
-  //         'POST',
-  //         Uri.parse(
-  //             'https://assure.essentiel.ph/api/mobile/api_send_payment/'));
-
-  //     request.fields['studid'] = id.toString();
-  //     request.fields['paymentType'] = paymentType;
-  //     request.fields['amount'] = amount;
-  //     request.fields['transDate'] = transDate;
-  //     request.fields['refNum'] = refNum;
-  //     request.fields['opcontact'] = opcontact;
-  //     request.fields['syid'] = syid;
-  //     request.fields['semid'] = semid;
-
-  //     if (_receiptImageFile != null) {
-  //       request.files.add(await http.MultipartFile.fromPath(
-  //           'recieptImage', _receiptImageFile!.path));
-  //     }
-  //     var response = await request.send();
-
-  //     if (response.statusCode == 200) {
-  //       String responseString = await response.stream.bytesToString();
-  //       print('Response: $responseString');
-
-  //       if (responseString.trim().startsWith('{')) {
-  //         var responseData = json.decode(responseString);
-
-  //         if (responseData['status'] == 0 &&
-  //             responseData['message'] == 'Reference Number already exists') {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             SnackBar(
-  //               content: Text('Reference Number already exists.'),
-  //               backgroundColor: Color.fromARGB(255, 133, 13, 22),
-  //             ),
-  //           );
-  //         } else {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             SnackBar(
-  //               content: Text('Payment submitted successfully!'),
-  //               backgroundColor: const Color.fromARGB(255, 73, 136, 75),
-  //             ),
-  //           );
-  //           _transactionDateController.clear();
-  //           _referenceNumberController.clear();
-  //           _paymentAmountController.clear();
-  //           _messageReceiverController.clear();
-  //           _contactNumberController.clear();
-  //           _receiptImageFile = null;
-  //           _receiptImageBytes = null;
-  //           setState(() {
-  //             _selectedPaymentType = null;
-  //           });
-  //         }
-  //       } else {
-  //         print('Unexpected response format: $responseString');
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             content: Text('Payment submitted successfully!'),
-  //             backgroundColor: Colors.green,
-  //           ),
-  //         );
-
-  //         _transactionDateController.clear();
-  //         _referenceNumberController.clear();
-  //         _paymentAmountController.clear();
-  //         _messageReceiverController.clear();
-  //         _contactNumberController.clear();
-  //         _receiptImageFile = null;
-  //         _receiptImageBytes = null;
-  //         setState(() {
-  //           _selectedPaymentType = null;
-  //         });
-  //       }
-  //     } else {
-  //       final responseString = await response.stream.bytesToString();
-  //       print('Failed response: $responseString');
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: Text('Failed to submit payment: $responseString'),
-  //           backgroundColor: Color.fromARGB(255, 133, 13, 22),
-  //         ),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     print('Error submitting payment: $e');
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('An error occurred. Please try again later.'),
-  //         backgroundColor: Color.fromARGB(255, 133, 13, 22),
-  //       ),
-  //     );
-  //   } finally {
-  //     setState(() {
-  //       loading = false;
-  //       _receiptImageFile = null;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -454,7 +342,7 @@ class _PaymentFormState extends State<PaymentForm> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 133, 13, 22),
+                color: schoolColor,
                 size: 100,
               ),
             )
@@ -717,8 +605,7 @@ class _PaymentFormState extends State<PaymentForm> {
                         child: ElevatedButton(
                           onPressed: _submitForm,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color.fromARGB(255, 133, 13, 22),
+                            backgroundColor: schoolColor,
                             foregroundColor: Colors.white,
                           ),
                           child: const Text(

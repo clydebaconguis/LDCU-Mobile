@@ -10,6 +10,7 @@ import 'package:pushtrial/models/schedule.dart';
 import 'package:pushtrial/models/event.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class TabCard extends StatefulWidget {
   const TabCard({super.key});
@@ -41,17 +42,44 @@ class TabCardState extends State<TabCard> {
   String syDesc = '';
   String sem = '';
 
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getUser();
     getUserInfo();
+    getSchoolInfo();
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 30.0, left: 8.0, right: 8.0),
+      padding: const EdgeInsets.only(left: 30, right: 30, bottom: 30, top: 5),
       child: Container(
         constraints: const BoxConstraints(maxHeight: 300),
         child: ContainedTabBarView(
@@ -73,14 +101,14 @@ class TabCardState extends State<TabCard> {
   Widget _buildTab(IconData icon, String title) {
     return Column(
       children: [
-        Icon(icon, color: const Color.fromARGB(255, 133, 13, 22)),
+        Icon(icon, color: schoolColor),
         const SizedBox(height: 4.0),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 11,
-            color: Color.fromARGB(255, 133, 13, 22),
+            color: schoolColor,
           ),
         ),
       ],
@@ -107,12 +135,12 @@ class TabCardState extends State<TabCard> {
     final sectionText = latestInfo.sectionname != "Not Found"
         ? "Section: ${latestInfo.sectionname}\n"
         : '';
-    final courseText = latestInfo.courseabrv.isNotEmpty
-        ? "Course: ${latestInfo.courseabrv}\n"
+    final courseText = latestInfo.courseDesc.isNotEmpty
+        ? "Course: ${latestInfo.courseDesc}\n"
         : '';
 
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: const EdgeInsets.only(bottom: 40, top: 20, left: 30, right: 30),
       child: Card(
         color: const Color.fromARGB(255, 14, 19, 29),
         child: Padding(
@@ -124,7 +152,7 @@ class TabCardState extends State<TabCard> {
             "$courseText",
             style: const TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 15,
+              fontSize: 13,
               color: Colors.white,
             ),
           ),
@@ -156,7 +184,7 @@ class TabCardState extends State<TabCard> {
           return Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Card(
-              color: const Color.fromARGB(255, 133, 13, 22),
+              color: schoolColor,
               elevation: 5,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -243,7 +271,7 @@ class TabCardState extends State<TabCard> {
           String formattedDate =
               DateFormat('MMMM d, yyyy').format(event.startTime);
           return Card(
-            color: const Color.fromARGB(255, 133, 13, 22),
+            color: schoolColor,
             margin: const EdgeInsets.symmetric(vertical: 8.0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
@@ -341,6 +369,7 @@ class TabCardState extends State<TabCard> {
         semester: '',
         strandcode: '',
         courseabrv: '',
+        courseDesc: '',
       ),
     );
   }

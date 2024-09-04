@@ -6,6 +6,7 @@ import '../widgets/credit_card.dart';
 import 'package:pushtrial/models/ledger.dart';
 import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class BillingInformationPage extends StatefulWidget {
   const BillingInformationPage({super.key});
@@ -28,10 +29,37 @@ class BillingInformationState extends State<BillingInformationPage> {
   String totalPayment = 'Php 100.00';
   bool loading = true;
 
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
   @override
   void initState() {
     super.initState();
     getUser();
+    getSchoolInfo();
+  }
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
   }
 
   @override
@@ -49,7 +77,7 @@ class BillingInformationState extends State<BillingInformationPage> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 133, 13, 22),
+                color: schoolColor,
                 size: 100,
               ),
             )

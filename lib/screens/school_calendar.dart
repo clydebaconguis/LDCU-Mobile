@@ -8,6 +8,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/event.dart';
 import 'package:intl/intl.dart';
+import 'package:pushtrial/models/school_info.dart';
 
 class SchoolCalendar extends StatefulWidget {
   const SchoolCalendar({super.key});
@@ -26,9 +27,36 @@ class _SchoolCalendarState extends State<SchoolCalendar> {
   late List<Appointment> _appointments = [];
   bool loading = true;
 
+  List<SchoolInfo> schoolInfo = [];
+  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 7 || hexString.length == 9) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  Future<void> getSchoolInfo() async {
+    final response = await CallApi().getSchoolInfo();
+
+    final parsedResponse = json.decode(response.body);
+    if (parsedResponse is List) {
+      setState(() {
+        schoolInfo = parsedResponse
+            .map((model) => SchoolInfo.fromJson(model))
+            .toList()
+            .cast<SchoolInfo>();
+
+        schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+      });
+    }
+  }
+
   @override
   void initState() {
     getUser();
+    getSchoolInfo();
     super.initState();
   }
 
@@ -135,7 +163,7 @@ class _SchoolCalendarState extends State<SchoolCalendar> {
       body: loading
           ? Center(
               child: LoadingAnimationWidget.prograssiveDots(
-                color: const Color.fromARGB(255, 133, 13, 22),
+                color: schoolColor,
                 size: 100,
               ),
             )
@@ -230,7 +258,7 @@ class _SchoolCalendarState extends State<SchoolCalendar> {
                               //     DateFormat('MMMM d, yyyy')
                               //         .format(event.endTime);
                               return Card(
-                                color: const Color.fromARGB(255, 133, 13, 22),
+                                color: schoolColor,
                                 margin: EdgeInsets.symmetric(vertical: 8.0),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
