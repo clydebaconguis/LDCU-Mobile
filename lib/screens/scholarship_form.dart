@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'scholarship_form.dart';
+import 'payment_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:pushtrial/api/api.dart';
@@ -7,14 +7,13 @@ import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:pushtrial/models/school_info.dart';
 
-class ScholarshipRequestScreen extends StatefulWidget {
-  const ScholarshipRequestScreen({super.key});
+class ScholarshipFormScreen extends StatefulWidget {
+  const ScholarshipFormScreen({super.key});
   @override
-  State<ScholarshipRequestScreen> createState() =>
-      ScholarshipRequestScreenState();
+  State<ScholarshipFormScreen> createState() => ScholarshipFormScreenState();
 }
 
-class ScholarshipRequestScreenState extends State<ScholarshipRequestScreen> {
+class ScholarshipFormScreenState extends State<ScholarshipFormScreen> {
   User user = UserData.myUser;
   int id = 0;
 
@@ -73,7 +72,7 @@ class ScholarshipRequestScreenState extends State<ScholarshipRequestScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            'SCHOLARSHIP REQUEST',
+            'SCHOLARSHIP FORM',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,
@@ -81,26 +80,6 @@ class ScholarshipRequestScreenState extends State<ScholarshipRequestScreen> {
             ),
           ),
           centerTitle: true,
-        ),
-        floatingActionButton: ClipOval(
-          child: Material(
-            color: schoolColor,
-            child: InkWell(
-              splashColor: schoolColor,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ScholarshipFormScreen()),
-                );
-              },
-              child: const SizedBox(
-                width: 56,
-                height: 56,
-                child: Icon(Icons.add, color: Colors.white),
-              ),
-            ),
-          ),
         ),
       ),
     );
