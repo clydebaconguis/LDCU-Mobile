@@ -3,9 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 class CallApi {
-  final String _mainDomain = "https://app-ldcu.essentiel.ph/";
+  // final String _mainDomain = "https://app-ldcu.essentiel.ph/";
   // final String _mainDomain = "http://127.0.0.1:8000/";
-  // final String _mainDomain = "http://192.168.50.13:8000/";
+  final String _mainDomain = "http://192.168.50.13:8000/";
   // final String _mainDomain = "https://assure.essentiel.ph/";
   final String _esDomain = "api/mobile/api_login";
   final String _enrollmentInfo = "api/mobile/api_enrollmentinfo";

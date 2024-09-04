@@ -318,7 +318,6 @@ class PaymentPageState extends State<PaymentPage> {
                             ),
                           )
                         : Container(
-                            color: Colors.grey[200],
                             padding: EdgeInsets.all(10),
                             child: Icon(
                               Icons.credit_score,

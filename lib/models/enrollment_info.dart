@@ -77,4 +77,9 @@ class EnrollmentInfo {
       'courseabrv': courseabrv,
     };
   }
+
+  @override
+  String toString() {
+    return 'EnrollmentInfo(syid: $syid,sydesc: $sydesc,levelname: $levelname, sectionname: $sectionname, semid: $semid, dateenrolled: $dateenrolled, levelid: $levelid, sectionid: $sectionid, isactive: $isactive, strandid: $strandid, semester: $semester, strandcode: $strandcode, courseabrv: $courseabrv)';
+  }
 }

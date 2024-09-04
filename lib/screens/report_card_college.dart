@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:pushtrial/models/grades.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:pushtrial/models/payments.dart';
 
 class ReportCardCollege extends StatefulWidget {
   const ReportCardCollege({super.key});
@@ -48,7 +49,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
         loading = true;
       });
       await getEnrollment();
-      await getGrades(0);
+      await getGrades(1);
     }
     setState(() {
       loading = false;
@@ -67,6 +68,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
 
         for (var gd in list) {
           gdList = gd['grades'];
+
           if (gradelevel < 17) {
             gdFinal = gd['finalgrade'];
           }
@@ -79,17 +81,26 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
         } else {
           data = gdList.map((model) {
             return Grades(
-              subjcode: model['subjcode'] ?? '',
-              subjdesc: model['subjdesc'] ?? '',
-              q1: model['prelemgrade'] ?? 0,
-              q2: model['midtermgrade'] ?? 0,
-              q3: model['prefigrade'] ?? 0,
-              q4: model['finalgrade'] ?? 0,
-              fg: model['fg'] ?? '',
-              finalrating: model['finalrating'] ?? '',
-              actiontaken: model['actiontaken'] ?? '',
+              syid: model['syid'] ?? 0,
+              semid: model['semid'] ?? 0,
+              subjcode: model['subjcode']?.toString() ?? '',
+              subjdesc: model['subjdesc']?.toString() ?? '',
+              q1: model['prelemgrade']?.toString() ?? '0',
+              q2: model['midtermgrade']?.toString() ?? '0',
+              q3: model['prefigrade']?.toString() ?? '0',
+              q4: model['finalgrade']?.toString() ?? '0',
+              prelemgrade: model['prelemgrade']?.toString() ?? '',
+              midtermgrade: model['midtermgrade']?.toString() ?? '',
+              prefigrade: model['prefigrade']?.toString() ?? '',
+              finalgrade: model['finalgrade']?.toString() ?? '',
+              finalrating: model['finalgrade']?.toString() ?? '',
+              fg: model['fg']?.toString() ?? '',
+              fgremarks: model['fgremarks']?.toString() ?? '',
+              actiontaken: model['actiontaken']?.toString() ?? '',
             );
           }).toList();
+
+          // print('data: $data');
         }
 
         if (gradelevel == 14 || gradelevel == 15) {
@@ -97,14 +108,21 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
             return ave['semid'].toString() == index.toString()
                 ? Grades.parseAverage(ave)
                 : Grades(
+                    syid: 0,
+                    semid: 0,
                     subjcode: '',
                     q1: '',
                     q2: '',
                     q3: '',
                     q4: '',
-                    fg: '',
+                    prelemgrade: '',
+                    midtermgrade: '',
+                    prefigrade: '',
+                    finalgrade: '',
                     finalrating: '',
+                    fg: '',
                     actiontaken: '',
+                    fgremarks: '',
                     subjdesc: '');
           }).toList();
         }
@@ -138,12 +156,14 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
 
         setState(() {
           syid = lastindex.syid;
-          semid = 1;
+          semid = lastindex.semid;
           gradelevel = lastindex.levelid;
           sectionid = lastindex.sectionid;
           strand = lastindex.strandid;
         });
         getGrades(1);
+
+        print('enInfoData: $enInfoData');
       });
     });
   }
@@ -284,7 +304,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                           columns: [
                             const DataColumn(
                                 label: Text(
-                              'Subjects',
+                              'Code',
                               style: TextStyle(
                                 fontSize: 11,
                               ),
@@ -313,7 +333,55 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                             const DataColumn(
                               label: Expanded(
                                 child: Text(
-                                  'Final\nRating',
+                                  'Prelim',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ),
+                            const DataColumn(
+                              label: Expanded(
+                                child: Text(
+                                  'Midterm',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ),
+                            const DataColumn(
+                              label: Expanded(
+                                child: Text(
+                                  'PreFinal',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ),
+                            const DataColumn(
+                              label: Expanded(
+                                child: Text(
+                                  'Final',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ),
+                            const DataColumn(
+                              label: Expanded(
+                                child: Text(
+                                  'Final\nGrade',
                                   style: TextStyle(
                                     fontSize: 11,
                                   ),
@@ -348,9 +416,9 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                                 cells: [
                                   DataCell(
                                     Container(
-                                      width: 100,
+                                      width: 80,
                                       child: Text(
-                                        grade.subjdesc,
+                                        grade.subjcode,
                                         style: TextStyle(
                                           fontSize: 10,
                                         ),
@@ -368,7 +436,7 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                                       children: [
                                         if (gradelevel >= 17)
                                           Container(
-                                            width: 100,
+                                            width: 200,
                                             child: Text(
                                               grade.subjdesc,
                                               style: TextStyle(
@@ -381,18 +449,47 @@ class _ReportCardCollegeState extends State<ReportCardCollege> {
                                       ],
                                     ),
                                   ),
-                                  grade.finalrating != "null"
-                                      ? DataCell(Text(
-                                          grade.finalrating,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                          ),
-                                        ))
-                                      : const DataCell(Text('')),
+                                  DataCell(Text(
+                                    grade.prelemgrade.isNotEmpty
+                                        ? grade.prelemgrade
+                                        : '',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                    ),
+                                  )),
+                                  DataCell(Text(
+                                    grade.midtermgrade.isNotEmpty
+                                        ? grade.midtermgrade
+                                        : '',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                    ),
+                                  )),
+                                  DataCell(Text(
+                                      grade.prefigrade.isNotEmpty
+                                          ? grade.prefigrade
+                                          : '',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                      ))),
+                                  DataCell(Text(
+                                    grade.finalgrade.isNotEmpty
+                                        ? grade.finalgrade
+                                        : '',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                    ),
+                                  )),
+                                  DataCell(Text(
+                                    grade.fg.isNotEmpty ? grade.fg : '',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                    ),
+                                  )),
                                   DataCell(
                                     Text(
-                                      grade.actiontaken.toString().isNotEmpty
-                                          ? grade.actiontaken
+                                      grade.fgremarks.toString().isNotEmpty
+                                          ? grade.fgremarks
                                           : '',
                                       style: TextStyle(
                                         fontSize: 11,

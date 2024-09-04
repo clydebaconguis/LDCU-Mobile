@@ -81,7 +81,7 @@ class SY {
 
   @override
   String toString() {
-    return 'Semester(id: $id,sydesc: $sydesc)';
+    return 'SY(id: $id,sydesc: $sydesc)';
   }
 }
 
