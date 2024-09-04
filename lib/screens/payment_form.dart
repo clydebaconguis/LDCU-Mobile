@@ -138,6 +138,7 @@ class _PaymentFormState extends State<PaymentForm> {
     setState(() {});
 
     print('Payment options: $_paymentOptions');
+    print('Semester options: $_semesterOptions');
   }
 
   Future<Uint8List?> pickImage() async {

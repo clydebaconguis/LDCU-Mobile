@@ -31,9 +31,9 @@ class _ReportCardState extends State<ReportCard> {
   var sectionid = 0;
   var strand = 0;
   String selectedYear = '';
-  String selectedSem = '1st Sem';
+  String selectedSem = '1st Semester';
   List<String> years = [];
-  List<String> sem = ['1st Sem', '2nd Sem'];
+  List<String> sem = ['1st Semester', '2nd Semester'];
   List<Grades> data = [];
   List<Grades> finalGrade = [];
   List<EnrollmentInfo> enInfoData = [];
@@ -76,14 +76,21 @@ class _ReportCardState extends State<ReportCard> {
         } else {
           data = gdList.map((model) {
             return Grades(
+              syid: model['syid'] ?? 0,
+              semid: model['semid'] ?? 0,
               subjcode: model['subjcode'] ?? '',
               subjdesc: model['subjdesc'] ?? '',
               q1: model['prelemgrade'] ?? 0,
               q2: model['midtermgrade'] ?? 0,
               q3: model['prefigrade'] ?? 0,
               q4: model['finalgrade'] ?? 0,
+              prelemgrade: model['prelemgrade'] ?? 0,
+              midtermgrade: model['midtermgrade'] ?? 0,
+              prefigrade: model['prefigrade'] ?? 0,
+              finalgrade: model['finalgrade'] ?? 0,
               fg: model['fg'] ?? '',
               finalrating: model['finalrating'] ?? '',
+              fgremarks: model['fgremarks'] ?? '',
               actiontaken: model['actiontaken'] ?? '',
             );
           }).toList();
@@ -94,13 +101,20 @@ class _ReportCardState extends State<ReportCard> {
             return ave['semid'].toString() == index.toString()
                 ? Grades.parseAverage(ave)
                 : Grades(
+                    syid: 0,
+                    semid: 0,
                     subjcode: '',
                     q1: '',
                     q2: '',
                     q3: '',
                     q4: '',
+                    prelemgrade: '',
+                    midtermgrade: '',
+                    prefigrade: '',
+                    finalgrade: '',
                     fg: '',
                     finalrating: '',
+                    fgremarks: '',
                     actiontaken: '',
                     subjdesc: '');
           }).toList();
