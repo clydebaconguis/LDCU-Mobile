@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pushtrial/push_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pushtrial/schools/screens/schools.dart';
 import 'firebase_options.dart';
 import '../models/user.dart';
 import 'auth/login.dart';
@@ -109,8 +110,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
       ),
-      // initialRoute: '/schools',
-      initialRoute: '/loading',
+      initialRoute: '/schools',
+      // initialRoute: '/loading',
       routes: {
         '/loading': (context) => LoadingScreen(),
         '/login': (context) => LoginScreen(),
@@ -121,7 +122,7 @@ class MyApp extends StatelessWidget {
           }
           return HomeScreen(user: user);
         },
-        // '/schools': (context) => SchoolScreen(),
+        '/schools': (context) => SchoolScreen(),
         '/notifications': (context) => NotificationsScreen(),
       },
     );

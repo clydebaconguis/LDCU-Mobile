@@ -61,6 +61,10 @@ dependencies:
   flutter_datetime_picker: ^1.5.1
   image: ^4.2.0
   file_picker: 8.0.7
+  url_launcher: ^6.3.0
+  open_file: ^3.5.3
+  flutter_file_downloader: ^2.0.0
+  flutter_pdfview: ^1.2.7
 
 dev_dependencies:
   flutter_test:

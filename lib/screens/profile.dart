@@ -80,11 +80,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PROFILE',
+        title: Text('PROFILE',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: schoolColor,
             )),
         centerTitle: true,
       ),

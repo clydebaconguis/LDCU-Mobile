@@ -331,11 +331,12 @@ class _PaymentFormState extends State<PaymentForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ONLINE PAYMENT FORM',
+        title: Text('ONLINE PAYMENT FORM',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: schoolColor,
             )),
         centerTitle: true,
       ),

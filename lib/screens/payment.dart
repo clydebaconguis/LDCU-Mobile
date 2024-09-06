@@ -127,12 +127,13 @@ class PaymentPageState extends State<PaymentPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
+          title: Text(
             'PAYMENT',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: schoolColor,
             ),
           ),
           centerTitle: true,

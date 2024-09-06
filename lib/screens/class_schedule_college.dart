@@ -253,11 +253,12 @@ class _ClassScheduleCollegeScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CLASS SCHEDULE',
+        title: Text('CLASS SCHEDULE',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: schoolColor,
             )),
         centerTitle: true,
       ),

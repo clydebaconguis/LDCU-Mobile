@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import 'dart:convert';
@@ -75,7 +76,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final json = preferences.getString('user');
     user = json == null ? UserData.myUser : User.fromJson(jsonDecode(json));
-    print('User data in notifications screen: $user');
 
     setState(() {
       studid = user.id;
@@ -88,46 +88,40 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     userLogin = json == null
         ? UserDataLogin.myUserLogin
         : Login.fromJson(jsonDecode(json));
-    print('User login data in notifications: $userLogin');
+    // print('User login data in notifications: $userLogin');
 
     type = userLogin.type;
   }
 
   Future<void> getSMSBunker() async {
-    try {
-      final response = await CallApi().getSmsBunker(studid);
+    final response = await CallApi().getSmsBunker(studid);
 
-      if (response.statusCode == 200) {
-        if (response.body.isEmpty) {
-          print('No data returned');
-          return;
-        }
-
-        Map<String, dynamic> data = json.decode(response.body);
-
-        setState(() {
-          if (userLogin.type == 7) {
-            sms = (data['smsbunkerstudent'] as List)
-                .map((model) => SMS.fromJson(model))
-                .toList();
-          } else if (userLogin.type == 9) {
-            final smsbunkerParents = (data['smsbunkerparents'] as List)
-                .map((model) => SMS.fromJson(model))
-                .toList();
-            final tapbunkerParents = (data['tapbunkerparents'] as List)
-                .map((model) => SMS.fromJson(model))
-                .toList();
-
-            sms = [...smsbunkerParents, ...tapbunkerParents];
-          }
-        });
-
-        print('Retrieved smsbunker for notifications: $sms');
-      } else {
-        print('Failed to load smsbunker. Status code: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        print('No data returned');
+        return;
       }
-    } catch (e) {
-      print('Exception occurred: $e');
+
+      Map<String, dynamic> data = json.decode(response.body);
+
+      setState(() {
+        if (userLogin.type == 7) {
+          sms = (data['smsbunkerstudent'] as List)
+              .map((model) => SMS.fromJson(model))
+              .toList();
+        } else if (userLogin.type == 9) {
+          final smsbunkerParents = (data['smsbunkerparents'] as List)
+              .map((model) => SMS.fromJson(model))
+              .toList();
+          final tapbunkerParents = (data['tapbunkerparents'] as List)
+              .map((model) => SMS.fromJson(model))
+              .toList();
+
+          sms = [...smsbunkerParents, ...tapbunkerParents];
+        }
+      });
+
+      // print('Retrieved smsbunker for notifications: $sms');
     }
   }
 
@@ -169,6 +163,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     List<SMS> filteredData = sms
         .where((item) => item.pushstatus == 1 || item.pushstatus == 2)
         .toList();
+
+    final dateFormat = DateFormat('MMMM d, yyyy h:mm a');
 
     filteredData.sort((a, b) {
       int statusComparison = a.pushstatus.compareTo(b.pushstatus);
@@ -224,6 +220,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       itemBuilder: (context, index) {
                         final notification = filteredData[index];
                         bool isReadStatus = notification.pushstatus == 2;
+
+                        final formattedDate = dateFormat.format(
+                            DateTime.parse(notification.createddatetime));
 
                         return SwipeActionCell(
                           key: ValueKey(notification.id),
@@ -281,7 +280,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        '${notification.createddatetime}',
+                                        formattedDate,
                                         style: TextStyle(
                                             color: Colors.grey,
                                             fontSize: 10,
