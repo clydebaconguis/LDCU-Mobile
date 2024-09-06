@@ -170,7 +170,7 @@ class PushNotifications {
         Iterable list = json.decode(response.body);
         data = list.map((model) => TapHistory.fromJson(model)).toList();
 
-        print('Retrieved tap history: $data');
+        // print('Retrieved tap history: $data');
       } else {
         print(
             'Failed to load tap history. Status code: ${response.statusCode}');

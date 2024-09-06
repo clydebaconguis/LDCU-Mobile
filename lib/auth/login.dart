@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
 import '../models/user.dart';
 import '../models/login.dart';
-import 'package:pushtrial/push_notifications.dart';
 import 'package:pushtrial/models/school_info.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -19,10 +19,12 @@ class _LoginState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final CallApi _callApi = CallApi();
   String? picurl;
-
+  String? pic;
   bool _obscureText = true;
-  String host = CallApi().getImage();
+  Future<String?> host = CallApi().getImage();
   List<SchoolInfo> schoolInfo = [];
+
+  bool loading = true;
 
   Color schoolColor = Color.fromARGB(0, 255, 255, 255);
 
@@ -53,6 +55,7 @@ class _LoginState extends State<LoginScreen> {
       });
 
       print(schoolInfo);
+      print(picurl);
     }
   }
 
@@ -69,6 +72,8 @@ class _LoginState extends State<LoginScreen> {
     } else {
       print('No school found in preferences.');
     }
+
+    pic = selectedSchool;
   }
 
   Future<void> _login() async {
@@ -129,8 +134,15 @@ class _LoginState extends State<LoginScreen> {
   }
 
   Future<void> _initializeData() async {
+    setState(() {
+      loading = true;
+    });
     await getSchoolInfo();
-    _loadSelectedSchool();
+    await _loadSelectedSchool();
+
+    setState(() {
+      loading = false;
+    });
   }
 
   void _showSnackBar(String message) {
@@ -149,122 +161,150 @@ class _LoginState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(left: 50, right: 50, bottom: 80),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (picurl != null) // Check if picurl is not null
-                  CachedNetworkImage(
-                    imageUrl: "$host$picurl",
-                    width: 200,
-                    height: 200,
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                    fit: BoxFit.cover,
-                  )
-                else
-                  SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: Icon(Icons.error, size: 50),
-                  ),
-                const SizedBox(height: 20),
-                const Text(
-                  'STUDENT PORTAL',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Poppins",
-                  ),
-                ),
-                const SizedBox(height: 25),
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your username';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscureText,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility : Icons.visibility_off,
-                        color: Colors.grey,
+      body: loading
+          ? Center(
+              child: LoadingAnimationWidget.prograssiveDots(
+                color: schoolColor,
+                size: 100,
+              ),
+            )
+          : Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(left: 50, right: 50, bottom: 80),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: <Widget>[
+                          const SizedBox(height: 5),
+                          (picurl != null && picurl!.isNotEmpty)
+                              ? CachedNetworkImage(
+                                  imageUrl: "$pic$picurl",
+                                  placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(
+                                    Icons.error,
+                                    size: 70,
+                                  ),
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    width: 200,
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox(
+                                  width: 200,
+                                  height: 200,
+                                  child: Icon(Icons.error),
+                                ),
+                        ],
                       ),
-                      onPressed: _togglePasswordVisibility,
-                    ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'STUDENT PORTAL',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Poppins",
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          labelText: 'Username',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your username';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscureText,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.grey,
+                            ),
+                            onPressed: _togglePasswordVisibility,
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 50),
+                      ElevatedButton(
+                        onPressed: _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(255, 109, 17, 10),
+                        ),
+                        child: const Text(
+                          'LOGIN',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 50),
-                ElevatedButton(
-                  onPressed: _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 109, 17, 10),
-                  ),
-                  child: const Text(
-                    'LOGIN',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

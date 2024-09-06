@@ -32,7 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<EnrollmentInfo> enInfoData = [];
   String syDesc = '';
   String sem = '';
-  String host = CallApi().getImage();
+  Future<String?> host = CallApi().getImage();
   bool isValid = false;
   bool loading = true;
 

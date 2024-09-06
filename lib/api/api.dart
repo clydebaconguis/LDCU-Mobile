@@ -642,7 +642,14 @@ class CallApi {
     );
   }
 
-  getImage() {
+  // getImage() async {
+  //   return _mainDomain;
+  // }
+
+  Future<String?> getImage() async {
+    if (_mainDomain == null) {
+      await _ensureDomainInitialized();
+    }
     return _mainDomain;
   }
 
@@ -665,7 +672,6 @@ class CallApi {
   }
 
   getDomain() async {
-    await _ensureDomainInitialized();
     return _mainDomain;
   }
 
