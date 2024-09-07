@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:pushtrial/push_notifications.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pushtrial/api/api.dart';
@@ -7,6 +8,7 @@ import '../models/user.dart';
 import '../models/login.dart';
 import 'package:pushtrial/models/school_info.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import '../schools/screens/schools.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -170,7 +172,7 @@ class _LoginState extends State<LoginScreen> {
             )
           : Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(left: 50, right: 50, bottom: 80),
+                padding: const EdgeInsets.only(left: 50, right: 50),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -232,7 +234,7 @@ class _LoginState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue),
+                            borderSide: BorderSide(color: schoolColor),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           enabledBorder: OutlineInputBorder(
@@ -261,7 +263,7 @@ class _LoginState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue),
+                            borderSide: BorderSide(color: schoolColor),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           enabledBorder: OutlineInputBorder(
@@ -285,21 +287,51 @@ class _LoginState extends State<LoginScreen> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 50),
-                      ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 109, 17, 10),
-                        ),
-                        child: const Text(
-                          'LOGIN',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Poppins',
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _login,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(255, 109, 17, 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text(
+                            'LOGIN',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Poppins',
+                            ),
                           ),
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 50.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SchoolScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Select School',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Poppins",
+                              color: schoolColor,
+                            ),
+                          ),
+                          splashColor: schoolColor
+                              .withOpacity(0.3), // Adds a ripple color effect
+                        ),
+                      )
                     ],
                   ),
                 ),

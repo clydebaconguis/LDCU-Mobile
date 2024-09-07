@@ -110,8 +110,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
       ),
-      initialRoute: '/schools',
-      // initialRoute: '/loading',
+      // initialRoute: '/schools',
+      initialRoute: '/loading',
       routes: {
         '/loading': (context) => LoadingScreen(),
         '/login': (context) => LoginScreen(),

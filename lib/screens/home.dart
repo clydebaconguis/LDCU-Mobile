@@ -22,6 +22,8 @@ import 'dart:convert';
 import 'dart:async';
 import 'scholarship_request.dart';
 import 'package:pushtrial/models/school_info.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -47,6 +49,12 @@ class _HomeScreenState extends State<HomeScreen>
   List<SMS> sms = [];
   Login userLogin = UserDataLogin.myUserLogin;
   int type = 0;
+
+  bool loading = true;
+  Future<String?> host = CallApi().getImage();
+  String? picurl;
+  String? pic;
+
   List<SchoolInfo> schoolInfo = [];
   Color schoolColor = Color.fromARGB(0, 255, 255, 255);
 
@@ -69,8 +77,26 @@ class _HomeScreenState extends State<HomeScreen>
             .cast<SchoolInfo>();
 
         schoolColor = hexToColor(schoolInfo[0].schoolcolor);
+        picurl = schoolInfo[0].picurl;
       });
     }
+  }
+
+  Future<String?> getSchool() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('selectedSchool');
+  }
+
+  Future<void> _loadSelectedSchool() async {
+    String? selectedSchool = await getSchool();
+
+    if (selectedSchool != null) {
+      print('Loaded school eslink: $selectedSchool');
+    } else {
+      print('No school found in preferences.');
+    }
+
+    pic = selectedSchool;
   }
 
   @override
@@ -84,10 +110,18 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _initializeData() async {
+    setState(() {
+      loading = true;
+    });
     await getUser();
     await getLogin();
     await getSMSBunker();
-    getSchoolInfo();
+    await getSchoolInfo();
+    await _loadSelectedSchool();
+
+    setState(() {
+      loading = false;
+    });
   }
 
   Future<void> getLogin() async {
@@ -265,278 +299,307 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     final user = widget.user;
 
-    return Scaffold(
-      backgroundColor: schoolColor,
-      appBar: AppBar(
-        backgroundColor: schoolColor,
-        leading: IconButton(
-          icon: Image.asset('assets/app_icon.png'),
-          color: Colors.white,
-          onPressed: () {},
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.manage_accounts),
-            color: Colors.white,
-            onPressed: () async {
-              await saveUserData(user);
+    return loading
+        ? Center(
+            child: LoadingAnimationWidget.prograssiveDots(
+              color: schoolColor,
+              size: 100,
+            ),
+          )
+        : Scaffold(
+            backgroundColor: schoolColor,
+            appBar: AppBar(
+              backgroundColor: schoolColor,
+              leading: IconButton(
+                icon: CachedNetworkImage(
+                  imageUrl: "$pic$picurl",
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  width: 100,
+                  height: 100,
+                ),
+                color: Colors.white,
+                onPressed: () {},
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.manage_accounts),
+                  color: Colors.white,
+                  onPressed: () async {
+                    await saveUserData(user);
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ProfileScreen(user: user)),
-              );
-            },
-          ),
-          PopupMenuButton<SMS>(
-            icon: Stack(
-              children: [
-                const Icon(Icons.notifications_active, color: Colors.white),
-                if (_notificationCount > 0)
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6.0, vertical: 2.0),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 14, 19, 29),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$_notificationCount',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8,
-                            fontWeight: FontWeight.bold,
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfileScreen(user: user)),
+                    );
+                  },
+                ),
+                PopupMenuButton<SMS>(
+                  icon: Stack(
+                    children: [
+                      const Icon(Icons.notifications_active,
+                          color: Colors.white),
+                      if (_notificationCount > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0, vertical: 2.0),
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 14, 19, 29),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '$_notificationCount',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  offset: const Offset(0, 50),
+                  onSelected: (SMS selectedNotification) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Notification'),
+                          content: Text(selectedNotification.message),
+                          actions: [
+                            TextButton(
+                              onPressed: () async {
+                                final updatedNotification = SMS(
+                                  id: selectedNotification.id,
+                                  studid: selectedNotification.studid,
+                                  pushstatus: 2,
+                                  receiver: selectedNotification.receiver,
+                                  message: selectedNotification.message,
+                                );
+                                setState(() {
+                                  sms = sms
+                                      .map((tap) =>
+                                          tap.id == updatedNotification.id
+                                              ? updatedNotification
+                                              : tap)
+                                      .toList();
+                                  _notificationCount = sms
+                                      .where((tap) => tap.pushstatus == 1)
+                                      .length;
+                                });
+
+                                await updateNotificationPushStatus(
+                                  updatedNotification.id,
+                                  updatedNotification.studid,
+                                  updatedNotification.pushstatus,
+                                );
+
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Mark as Read'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  itemBuilder: (BuildContext context) {
+                    final filteredNotifications =
+                        sms.where((tap) => tap.pushstatus == 1).toList();
+
+                    _notificationCount = filteredNotifications.length;
+
+                    return [
+                      ...filteredNotifications.map(
+                        (notification) => PopupMenuItem<SMS>(
+                          value: notification,
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              maxWidth: 200,
+                            ),
+                            child: Text(
+                              notification.message,
+                              style: const TextStyle(fontSize: 10),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem<SMS>(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NotificationsScreen(
+                                    // onNotificationsViewed: () {
+                                    //   setState(() {});
+                                    // },
+                                    ),
+                              ),
+                            );
+                          },
+                          child: Center(
+                            child: Text(
+                              'View All Notifications',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: schoolColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ];
+                  },
+                )
               ],
             ),
-            offset: const Offset(0, 50),
-            onSelected: (SMS selectedNotification) {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Notification'),
-                    content: Text(selectedNotification.message),
-                    actions: [
-                      TextButton(
-                        onPressed: () async {
-                          final updatedNotification = SMS(
-                            id: selectedNotification.id,
-                            studid: selectedNotification.studid,
-                            pushstatus: 2,
-                            receiver: selectedNotification.receiver,
-                            message: selectedNotification.message,
-                          );
-                          setState(() {
-                            sms = sms
-                                .map((tap) => tap.id == updatedNotification.id
-                                    ? updatedNotification
-                                    : tap)
-                                .toList();
-                            _notificationCount =
-                                sms.where((tap) => tap.pushstatus == 1).length;
-                          });
-
-                          await updateNotificationPushStatus(
-                            updatedNotification.id,
-                            updatedNotification.studid,
-                            updatedNotification.pushstatus,
-                          );
-
-                          Navigator.of(context).pop();
+            body: loading
+                ? Center(
+                    child: LoadingAnimationWidget.prograssiveDots(
+                      color: Colors.black,
+                      size: 100,
+                    ),
+                  )
+                : Stack(
+                    children: [
+                      FutureBuilder<void>(
+                        future: _checkAndNotifyFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Row(
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            "Welcome Back!",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.8,
+                                            child: Text(
+                                              "${user.firstname} ${user.lastname}",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 22,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              overflow: TextOverflow.visible,
+                                              maxLines: 1,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        margin:
+                                            const EdgeInsets.only(top: 100.0),
+                                        color: Colors.white,
+                                        // child: Column(
+                                        //   children: [
+                                        //     Expanded(child: Container()),
+                                        //     const Center(
+                                        //       child: ActionButtons(),
+                                        //     ),
+                                        //     const Padding(
+                                        //       padding: EdgeInsets.all(8.0),
+                                        //       child: TabCard(),
+                                        //     ),
+                                        //   ],
+                                        // ),
+                                      ),
+                                      const Positioned(
+                                        left: 25,
+                                        right: 25,
+                                        child: CreditCard(),
+                                      ),
+                                      Column(
+                                        children: [
+                                          Expanded(child: Container()),
+                                          const Center(
+                                            child: ActionButtons(),
+                                          ),
+                                          const Center(
+                                            child: TabCard(),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
                         },
-                        child: const Text('Mark as Read'),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: FloatingActionButton.extended(
+                            onPressed: () {
+                              _showMenu(context);
+                            },
+                            label: const Text(
+                              'Menu',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                            shape: const CircleBorder(),
+                            backgroundColor: schoolColor,
+                          ),
+                        ),
                       ),
                     ],
-                  );
-                },
-              );
-            },
-            itemBuilder: (BuildContext context) {
-              final filteredNotifications =
-                  sms.where((tap) => tap.pushstatus == 1).toList();
-
-              _notificationCount = filteredNotifications.length;
-
-              return [
-                ...filteredNotifications.map(
-                  (notification) => PopupMenuItem<SMS>(
-                    value: notification,
-                    child: Container(
-                      constraints: const BoxConstraints(
-                        maxWidth: 200,
-                      ),
-                      child: Text(
-                        notification.message,
-                        style: const TextStyle(fontSize: 10),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
                   ),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem<SMS>(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NotificationsScreen(
-                              // onNotificationsViewed: () {
-                              //   setState(() {});
-                              // },
-                              ),
-                        ),
-                      );
-                    },
-                    child: Center(
-                      child: Text(
-                        'View All Notifications',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: schoolColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ];
-            },
-          )
-        ],
-      ),
-      body: Stack(
-        children: [
-          FutureBuilder<void>(
-            future: _checkAndNotifyFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error: ${snapshot.error}'),
-                );
-              } else {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Welcome Back!",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.8,
-                                child: Text(
-                                  "${user.firstname} ${user.lastname}",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.visible,
-                                  maxLines: 1,
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 100.0),
-                            color: Colors.white,
-                            // child: Column(
-                            //   children: [
-                            //     Expanded(child: Container()),
-                            //     const Center(
-                            //       child: ActionButtons(),
-                            //     ),
-                            //     const Padding(
-                            //       padding: EdgeInsets.all(8.0),
-                            //       child: TabCard(),
-                            //     ),
-                            //   ],
-                            // ),
-                          ),
-                          const Positioned(
-                            left: 25,
-                            right: 25,
-                            child: CreditCard(),
-                          ),
-                          Column(
-                            children: [
-                              Expanded(child: Container()),
-                              const Center(
-                                child: ActionButtons(),
-                              ),
-                              const Center(
-                                child: TabCard(),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }
-            },
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FloatingActionButton.extended(
-                onPressed: () {
-                  _showMenu(context);
-                },
-                label: const Text(
-                  'Menu',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-                shape: const CircleBorder(),
-                backgroundColor: schoolColor,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   void _showMenu(BuildContext context) {

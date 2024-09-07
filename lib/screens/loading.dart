@@ -25,8 +25,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
       final user = User.fromJson(jsonDecode(userJson));
       Navigator.pushReplacementNamed(context, '/home', arguments: user);
     } else {
-      Navigator.pushReplacementNamed(context, '/login');
-      // Navigator.pushReplacementNamed(context, '/schools');
+      Navigator.pushReplacementNamed(context, '/schools');
+      // Navigator.pushReplacementNamed(context, '/login');
     }
   }
 

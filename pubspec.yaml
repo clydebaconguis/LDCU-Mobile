@@ -65,6 +65,7 @@ dependencies:
   open_file: ^3.5.3
   flutter_file_downloader: ^2.0.0
   flutter_pdfview: ^1.2.7
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:
