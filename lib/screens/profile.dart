@@ -486,23 +486,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final userLogin = Login.fromJson(jsonDecode(userLoginJson!));
       final type = userLogin.type;
 
-      // final fcmtoken = await _firebaseMessaging.getToken();
+      final fcmtoken = await _firebaseMessaging.getToken();
 
-      // try {
-      //   final response = await CallApi().getDeleteToken(
-      //     studid,
-      //     type,
-      //     fcmtoken,
-      //   );
+      try {
+        final response = await CallApi().getDeleteToken(
+          studid,
+          type,
+          fcmtoken,
+        );
 
-      //   if (response.statusCode == 200) {
-      //     print('FCM Token deleted successfully');
-      //   } else {
-      //     print('Failed to delete FCM Token');
-      //   }
-      // } catch (e) {
-      //   print('Exception occurred while deleting FCM token: $e');
-      // }
+        if (response.statusCode == 200) {
+          print('FCM Token deleted successfully');
+        } else {
+          print('Failed to delete FCM Token');
+        }
+      } catch (e) {
+        print('Exception occurred while deleting FCM token: $e');
+      }
     }
 
     await prefs.remove('user');

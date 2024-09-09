@@ -103,10 +103,10 @@ class _LoginState extends State<LoginScreen> {
               await prefs.setString(
                   'userlogin', jsonEncode(userLogin.toJson()));
 
-              // String? token = await PushNotifications.getFCMToken();
-              // if (token != null) {
-              //   await _callApi.getSaveToken(user.id, userLogin.type, token);
-              // }
+              String? token = await PushNotifications.getFCMToken();
+              if (token != null) {
+                await _callApi.getSaveToken(user.id, userLogin.type, token);
+              }
 
               Navigator.pushReplacementNamed(context, '/home', arguments: user);
             } else {
@@ -293,8 +293,7 @@ class _LoginState extends State<LoginScreen> {
                         child: ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color.fromARGB(255, 109, 17, 10),
+                            backgroundColor: schoolColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -319,6 +318,7 @@ class _LoginState extends State<LoginScreen> {
                               ),
                             );
                           },
+                          splashColor: schoolColor.withOpacity(0.3),
                           child: Text(
                             'Select School',
                             style: TextStyle(
@@ -328,8 +328,6 @@ class _LoginState extends State<LoginScreen> {
                               color: schoolColor,
                             ),
                           ),
-                          splashColor: schoolColor
-                              .withOpacity(0.3), // Adds a ripple color effect
                         ),
                       )
                     ],

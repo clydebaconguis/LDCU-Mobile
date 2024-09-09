@@ -9,6 +9,7 @@ import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:pushtrial/models/onlinepayments.dart';
 import 'package:pushtrial/models/school_info.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -199,114 +200,134 @@ class PaymentPageState extends State<PaymentPage> {
     final dateFormat = DateFormat('MMMM d, yyyy');
     final amountFormat = NumberFormat('#,##0.00', 'en_US');
 
-    // Sort payments by date in descending order
     payments.sort((a, b) =>
         DateTime.parse(b.paymentDate).compareTo(DateTime.parse(a.paymentDate)));
 
     return Padding(
       padding: const EdgeInsets.all(20.0),
-      child: ListView.builder(
-        itemCount: payments.length,
-        itemBuilder: (context, index) {
-          final payment = payments[index];
-          final formattedDate =
-              dateFormat.format(DateTime.parse(payment.paymentDate));
-          final double amountPaid = double.parse(payment.amount);
-          final formattedAmount = amountFormat.format(amountPaid);
-
-          return Card(
-            margin: const EdgeInsets.all(7.0),
-            color: Colors.white,
-            elevation: 5.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: ClipOval(
-                    child: payment.description == 'BANK'
-                        ? Container(
-                            color: Colors.grey[200],
-                            padding: EdgeInsets.all(10),
-                            child: Icon(
-                              Icons.account_balance,
-                              size: 40,
-                              color: Colors.black,
-                            ),
-                          )
-                        : Image.asset(
-                            payment.description == 'GCASH'
-                                ? 'assets/gcash.jpg'
-                                : 'assets/palawan.png',
-                            height: 45,
-                            width: 45,
-                            fit: BoxFit.cover,
-                          ),
-                  ),
+      child: CustomRefreshIndicator(
+        onRefresh: () async {
+          await getOnlinePayments();
+        },
+        builder: (context, child, controller) {
+          return Stack(
+            alignment: Alignment.topCenter,
+            children: <Widget>[
+              if (controller.isLoading)
+                Positioned(
+                  top: 20.0,
+                  child: CircularProgressIndicator(),
                 ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          formattedDate,
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 10),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              payment.description,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                            Text(
-                              'Php $formattedAmount',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'RN: ${payment.refNum}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              '(${payment.getStatus()})',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              Transform.translate(
+                offset: Offset(0, controller.value * 100),
+                child: child,
+              ),
+            ],
           );
         },
+        child: ListView.builder(
+          itemCount: payments.length,
+          itemBuilder: (context, index) {
+            final payment = payments[index];
+            final formattedDate =
+                dateFormat.format(DateTime.parse(payment.paymentDate));
+            final double amountPaid = double.parse(payment.amount);
+            final formattedAmount = amountFormat.format(amountPaid);
+
+            return Card(
+              margin: const EdgeInsets.all(7.0),
+              color: Colors.white,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: ClipOval(
+                      child: payment.description == 'BANK'
+                          ? Container(
+                              color: Colors.grey[200],
+                              padding: EdgeInsets.all(10),
+                              child: Icon(
+                                Icons.account_balance,
+                                size: 40,
+                                color: Colors.black,
+                              ),
+                            )
+                          : Image.asset(
+                              payment.description == 'GCASH'
+                                  ? 'assets/gcash.jpg'
+                                  : 'assets/palawan.png',
+                              height: 45,
+                              width: 45,
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            formattedDate,
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 10),
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                payment.description,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                              Text(
+                                'Php $formattedAmount',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'RN: ${payment.refNum}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                '(${payment.getStatus()})',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -314,88 +335,110 @@ class PaymentPageState extends State<PaymentPage> {
   Widget _buildTransactionsTab() {
     final dateFormat = DateFormat('MMMM d, yyyy h:mm a');
     final amountFormat = NumberFormat('#,##0.00', 'en_US');
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
-      child: ListView.builder(
-        itemCount: trans.length,
-        itemBuilder: (context, index) {
-          final transaction = trans[index];
-          final formattedDate =
-              dateFormat.format(DateTime.parse(transaction.transdate));
-          final double amountPaid = double.parse(transaction.amountpaid);
-          final formattedAmount = amountFormat.format(amountPaid);
-
-          return Card(
-            color: Colors.white,
-            margin: const EdgeInsets.all(7.0),
-            elevation: 5.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: ClipOval(
-                    child: transaction.paytype == 'CASH'
-                        ? Container(
-                            padding: EdgeInsets.all(10),
-                            child: Icon(
-                              Icons.payments,
-                              size: 25,
-                              color: Colors.black,
-                            ),
-                          )
-                        : Container(
-                            padding: EdgeInsets.all(10),
-                            child: Icon(
-                              Icons.credit_score,
-                              size: 25,
-                              color: Colors.black,
-                            ),
-                          ),
-                  ),
+      child: CustomRefreshIndicator(
+        onRefresh: () async {
+          await getTransactions();
+        },
+        builder: (context, child, controller) {
+          return Stack(
+            alignment: Alignment.topCenter,
+            children: <Widget>[
+              if (controller.isLoading)
+                Positioned(
+                  top: 20.0,
+                  child: CircularProgressIndicator(),
                 ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          formattedDate,
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 10),
-                        ),
-                        const SizedBox(height: 8.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${transaction.paytype} - OR#: ${transaction.ornum}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  fontSize: 12),
-                            ),
-                            Text(
-                              'Php $formattedAmount',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              Transform.translate(
+                offset: Offset(0, controller.value * 100),
+                child: child,
+              ),
+            ],
           );
         },
+        child: ListView.builder(
+          itemCount: trans.length,
+          itemBuilder: (context, index) {
+            final transaction = trans[index];
+            final formattedDate =
+                dateFormat.format(DateTime.parse(transaction.transdate));
+            final double amountPaid = double.parse(transaction.amountpaid);
+            final formattedAmount = amountFormat.format(amountPaid);
+
+            return Card(
+              color: Colors.white,
+              margin: const EdgeInsets.all(7.0),
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: ClipOval(
+                      child: transaction.paytype == 'CASH'
+                          ? Container(
+                              padding: EdgeInsets.all(10),
+                              child: Icon(
+                                Icons.payments,
+                                size: 25,
+                                color: Colors.black,
+                              ),
+                            )
+                          : Container(
+                              padding: EdgeInsets.all(10),
+                              child: Icon(
+                                Icons.credit_score,
+                                size: 25,
+                                color: Colors.black,
+                              ),
+                            ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            formattedDate,
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 10),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${transaction.paytype} - OR#: ${transaction.ornum}',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontSize: 12),
+                              ),
+                              Text(
+                                'Php $formattedAmount',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

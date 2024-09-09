@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
-        android:label="LDCU"
+        android:label="Essentiel"
         android:name="${applicationName}"
         android:icon="@drawable/app_icon">
         <activity

@@ -182,6 +182,8 @@ class _ReportCardState extends State<ReportCard> {
           sectionid = lastindex.sectionid;
           strand = lastindex.strandid;
         });
+
+        print('Enrollement Data: $enInfoData');
         getGrades(1);
       });
     });
@@ -252,60 +254,60 @@ class _ReportCardState extends State<ReportCard> {
     return ListView(
       padding: const EdgeInsets.all(30),
       children: [
-        if (gradelevel >= 14) ...[
-          Row(
-            children: [
-              Expanded(
-                child: selectedYear.isNotEmpty
-                    ? DropdownButtonFormField2<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'School Year',
-                          labelStyle: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          border: OutlineInputBorder(),
+        Row(
+          children: [
+            Expanded(
+              child: selectedYear.isNotEmpty
+                  ? DropdownButtonFormField2<String>(
+                      decoration: const InputDecoration(
+                        labelText: 'School Year',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
-                        isExpanded: true,
-                        hint: const Text(
-                          'Choose a school year',
-                          style: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
-                        ),
-                        value: selectedYear,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedYear = newValue!;
-                            for (var yr in enInfoData) {
-                              if (yr.sydesc == selectedYear) {
-                                syid = yr.syid;
-                                selectedSem = sem[0];
-                                gradelevel = yr.levelid;
-                                sectionid = yr.sectionid;
-                                strand = yr.strandid;
-                                getGrades(yr.semid);
-                              }
+                        border: OutlineInputBorder(),
+                      ),
+                      isExpanded: true,
+                      hint: const Text(
+                        'Choose a school year',
+                        style: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
+                      ),
+                      value: selectedYear,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedYear = newValue!;
+                          for (var yr in enInfoData) {
+                            if (yr.sydesc == selectedYear) {
+                              syid = yr.syid;
+                              selectedSem = sem[0];
+                              gradelevel = yr.levelid;
+                              sectionid = yr.sectionid;
+                              strand = yr.strandid;
+                              getGrades(yr.semid);
                             }
-                          });
-                        },
-                        items: years.map<DropdownMenuItem<String>>(
-                          (String year) {
-                            return DropdownMenuItem<String>(
-                              value: year,
-                              child: Text(
-                                year,
-                                style: const TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12,
-                                ),
+                          }
+                        });
+                      },
+                      items: years.map<DropdownMenuItem<String>>(
+                        (String year) {
+                          return DropdownMenuItem<String>(
+                            value: year,
+                            child: Text(
+                              year,
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
                               ),
-                            );
-                          },
-                        ).toList(),
-                      )
-                    : const CircularProgressIndicator(),
-              ),
-              const SizedBox(width: 10.0),
+                            ),
+                          );
+                        },
+                      ).toList(),
+                    )
+                  : const CircularProgressIndicator(),
+            ),
+            const SizedBox(width: 10.0),
+            if (gradelevel >= 14)
               Expanded(
                 child: selectedSem.isNotEmpty
                     ? DropdownButtonFormField2<String>(
@@ -345,307 +347,643 @@ class _ReportCardState extends State<ReportCard> {
                       )
                     : const CircularProgressIndicator(),
               ),
-            ],
-          ),
-        ],
-        if (gradelevel < 14) ...[
-          selectedYear.isNotEmpty
-              ? DropdownButtonFormField2<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'School Year',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    border: OutlineInputBorder(),
-                  ),
-                  isExpanded: true,
-                  hint: const Text(
-                    'Choose a school year',
-                    style: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
-                  ),
-                  value: selectedYear,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedYear = newValue!;
-                      for (var yr in enInfoData) {
-                        if (yr.sydesc == selectedYear) {
-                          syid = yr.syid;
-                          selectedSem = sem[0];
-                          gradelevel = yr.levelid;
-                          sectionid = yr.sectionid;
-                          strand = yr.strandid;
-                          getGrades(yr.semid);
-                        }
-                      }
-                    });
-                  },
-                  items: years.map<DropdownMenuItem<String>>(
-                    (String year) {
-                      return DropdownMenuItem<String>(
-                        value: year,
-                        child: Text(
-                          year,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 12,
-                          ),
-                        ),
-                      );
-                    },
-                  ).toList(),
-                )
-              : const CircularProgressIndicator(),
-        ],
-        const SizedBox(
-          height: 20,
+          ],
         ),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minWidth: constraints.maxWidth,
-                ),
-                child: DataTable(
-                  columnSpacing: 30.0,
-                  columns: [
-                    const DataColumn(
-                        label: Text(
-                      'Subjects',
-                      style: TextStyle(
-                        fontSize: 11,
-                      ),
-                    )),
-                    DataColumn(
-                      label: MergeSemantics(
-                        child: SizedBox(
-                          width: 112,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (gradelevel >= 17 || gradelevel == 0)
-                                const Text(
-                                  'Subject Description',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                ),
-                              if (gradelevel < 17 && gradelevel != 0)
-                                const Text(
-                                  'Periodic Ratings',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(fontSize: 11),
-                                ),
-                              if (gradelevel < 17 && gradelevel != 0)
-                                const Divider(
-                                  height: 5,
-                                  thickness: 1,
-                                  color: Colors.grey,
-                                ),
-                              if (gradelevel == 14 ||
-                                  gradelevel == 15 && gradelevel != 0)
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+        const SizedBox(height: 20),
+        ...concatenatedArray.map(
+          (grade) => Container(
+            margin: const EdgeInsets.only(bottom: 16.0),
+            decoration: BoxDecoration(),
+            child: ClipRRect(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    color: schoolColor,
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text.rich(
+                                TextSpan(
                                   children: [
-                                    if (semid == 1) const Text('Q1'),
-                                    if (semid == 1) const Text('Q2'),
-                                    if (semid == 2) const Text('Q3'),
-                                    if (semid == 2) const Text('Q4'),
+                                    TextSpan(
+                                      text: '${grade.subjcode}: ',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: grade.subjdesc,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
                                   ],
-                                ),
-                              if (gradelevel != 14 &&
-                                  gradelevel != 15 &&
-                                  gradelevel != 17 &&
-                                  gradelevel < 17 &&
-                                  gradelevel != 0)
-                                const Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text('Q1'),
-                                    Text('Q2'),
-                                    Text('Q3'),
-                                    Text('Q4'),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const DataColumn(
-                      label: Expanded(
-                        child: Text(
-                          'Final\nRating',
-                          style: TextStyle(
-                            fontSize: 11,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ),
-                    ),
-                    const DataColumn(
-                      label: Expanded(
-                        child: Text(
-                          'Action \nTaken',
-                          style: TextStyle(
-                            fontSize: 11,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ),
-                    ),
-                  ],
-                  rows: concatenatedArray.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final grade = entry.value;
-                    final isEvenRow = index % 2 == 0;
-                    final rowColor =
-                        isEvenRow ? Colors.grey.shade200 : Colors.white;
-
-                    return DataRow(
-                        color:
-                            WidgetStateColor.resolveWith((states) => rowColor),
-                        cells: [
-                          DataCell(
-                            Container(
-                              width: 250,
-                              child: Text(
-                                grade.subjdesc,
-                                style: const TextStyle(
-                                  fontSize: 10,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 3,
                               ),
                             ),
                           ),
-                          DataCell(
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                if (gradelevel >= 17)
-                                  Container(
-                                    width: 100,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    child: Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Table(
+                            columnWidths: const {
+                              0: FlexColumnWidth(1),
+                              1: FlexColumnWidth(1),
+                              2: FlexColumnWidth(1),
+                              3: FlexColumnWidth(1),
+                              4: FlexColumnWidth(1),
+                              5: FlexColumnWidth(1.5),
+                            },
+                            border: TableBorder.all(color: Colors.black12),
+                            children: [
+                              TableRow(
+                                decoration: BoxDecoration(
+                                    color: schoolColor.withOpacity(.2)),
+                                children: const [
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 8.0),
                                     child: Text(
-                                      grade.subjdesc,
-                                      style: const TextStyle(
-                                        fontSize: 10,
+                                      'Q1',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 3,
                                     ),
                                   ),
-                                if (gradelevel == 14 || gradelevel == 15)
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      if (semid == 1)
-                                        Text(
-                                          grade.q1 != "null" ? grade.q1 : '  ',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                          ),
-                                        ),
-                                      if (semid == 1)
-                                        Text(
-                                          grade.q2 != "null" ? grade.q2 : '  ',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                          ),
-                                        ),
-                                      if (semid == 2)
-                                        Text(
-                                          grade.q3 != "null" ? grade.q3 : '  ',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                          ),
-                                        ),
-                                      if (semid == 2)
-                                        Text(
-                                          grade.q4 != "null" ? grade.q4 : '  ',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                          ),
-                                        ),
-                                    ],
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      'Q2',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                if (gradelevel != 14 &&
-                                    gradelevel != 15 &&
-                                    gradelevel != 17 &&
-                                    gradelevel < 17)
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        grade.q1 != "null" ? grade.q1 : '  ',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      'Q3',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      Text(
-                                        grade.q2 != "null" ? grade.q2 : '  ',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                      Text(
-                                        grade.q3 != "null" ? grade.q3 : '  ',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                      Text(
-                                        grade.q4 != "null" ? grade.q4 : '  ',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                              ],
-                            ),
-                          ),
-                          grade.finalrating != "null"
-                              ? DataCell(Text(
-                                  grade.finalrating,
-                                  style: const TextStyle(
-                                    fontSize: 11,
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      'Q4',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                ))
-                              : const DataCell(Text('')),
-                          DataCell(
-                            Text(
-                              grade.actiontaken.toString().isNotEmpty
-                                  ? grade.actiontaken
-                                  : '',
-                              style: const TextStyle(
-                                fontSize: 11,
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      'Final\nRating',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      'Action\nTaken',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
+                              TableRow(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Text(
+                                      grade.q1 != "null" ? grade.q1 : '  ',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Text(
+                                      grade.q2 != "null" ? grade.q2 : '  ',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Text(
+                                      grade.q3 != "null" ? grade.q3 : '  ',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Text(
+                                      grade.q4 != "null" ? grade.q4 : '  ',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Text(
+                                      grade.finalrating != "null"
+                                          ? grade.finalrating
+                                          : '  ',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Text(
+                                      grade.actiontaken,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 12,
+                                        color: grade.actiontaken == 'PASSED'
+                                            ? Colors.green
+                                            : Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ]);
-                  }).toList(),
-                ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
               ),
-            );
-          },
+            ),
+          ),
         ),
       ],
     );
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('REPORT CARD',
+  //           style: TextStyle(
+  //             fontFamily: 'Poppins',
+  //             fontSize: 18,
+  //             fontWeight: FontWeight.bold,
+  //             color: schoolColor,
+  //           )),
+  //       centerTitle: true,
+  //     ),
+  //     body: loading
+  //         ? Center(
+  //             child: LoadingAnimationWidget.prograssiveDots(
+  //               color: schoolColor,
+  //               size: 100,
+  //             ),
+  //           )
+  //         : ListView(
+  //             padding: const EdgeInsets.all(20),
+  //             children: [
+  //               Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: selectedYear.isNotEmpty
+  //                         ? DropdownButtonFormField2<String>(
+  //                             decoration: InputDecoration(
+  //                               labelText: 'School Year',
+  //                               labelStyle: TextStyle(
+  //                                 fontFamily: 'Poppins',
+  //                                 fontSize: 12,
+  //                                 fontWeight: FontWeight.w500,
+  //                               ),
+  //                               border: OutlineInputBorder(),
+  //                             ),
+  //                             isExpanded: true,
+  //                             hint: Text(
+  //                               'Choose a school year',
+  //                               style: TextStyle(
+  //                                   fontSize: 11, fontFamily: 'Poppins'),
+  //                             ),
+  //                             value: selectedYear,
+  //                             onChanged: (String? newValue) {
+  //                               setState(() {
+  //                                 selectedYear = newValue!;
+  //                                 for (var yr in enInfoData) {
+  //                                   if (yr.sydesc == selectedYear) {
+  //                                     syid = yr.syid;
+  //                                     selectedSem = yr.semester;
+  //                                     gradelevel = yr.levelid;
+  //                                     sectionid = yr.sectionid;
+  //                                     strand = yr.strandid;
+  //                                     getGrades(yr.semid);
+  //                                   }
+  //                                 }
+  //                               });
+  //                             },
+  //                             items: years.map<DropdownMenuItem<String>>(
+  //                               (String year) {
+  //                                 return DropdownMenuItem<String>(
+  //                                   value: year,
+  //                                   child: Text(
+  //                                     year,
+  //                                     style: TextStyle(
+  //                                       fontFamily: 'Poppins',
+  //                                       fontSize: 11,
+  //                                     ),
+  //                                   ),
+  //                                 );
+  //                               },
+  //                             ).toList(),
+  //                           )
+  //                         : const CircularProgressIndicator(),
+  //                   ),
+  //                   SizedBox(width: 10.0),
+  //                   if (gradelevel == 14 ||
+  //                       gradelevel == 15 ||
+  //                       gradelevel >= 17)
+  //                     Expanded(
+  //                       child: selectedSem.isNotEmpty
+  //                           // ? DropdownButtonFormField2<String>(
+  //                           //     decoration: InputDecoration(
+  //                           //       labelText: 'Semester',
+  //                           //       labelStyle: TextStyle(
+  //                           //         fontFamily: 'Poppins',
+  //                           //         fontSize: 12,
+  //                           //         fontWeight: FontWeight.w500,
+  //                           //       ),
+  //                           //       border: OutlineInputBorder(),
+  //                           //     ),
+  //                           //     isExpanded: true,
+  //                           //     value: selectedSem,
+  //                           //     hint: const Text('Select Sem'),
+  //                           //     onChanged: (String? newValue) {
+  //                           //       setState(() {
+  //                           //         selectedSem = newValue!;
+  //                           //         var index = sem.indexOf(selectedSem) + 1;
+  //                           //         getGrades(index);
+  //                           //       });
+  //                           //     },
+  //                           //     items: sem.map<DropdownMenuItem<String>>(
+  //                           //       (String semes) {
+  //                           //         return DropdownMenuItem<String>(
+  //                           //           value: semes,
+  //                           //           child: Text(
+  //                           //             semes,
+  //                           //             style: TextStyle(
+  //                           //               fontFamily: 'Poppins',
+  //                           //               fontSize: 12,
+  //                           //             ),
+  //                           //           ),
+  //                           //         );
+  //                           //       },
+  //                           //     ).toList(),
+  //                           //   )
+  //                           // : const CircularProgressIndicator(),
+
+  //                           ? DropdownButtonFormField2<String>(
+  //                               decoration: InputDecoration(
+  //                                 border: OutlineInputBorder(),
+  //                                 labelText: 'Semester',
+  //                                 labelStyle: TextStyle(
+  //                                   fontFamily: 'Poppins',
+  //                                   fontSize: 12,
+  //                                   fontWeight: FontWeight.w500,
+  //                                 ),
+  //                               ),
+  //                               isExpanded: true,
+  //                               hint: const Text(
+  //                                 'Choose a semester',
+  //                                 style: TextStyle(
+  //                                     fontSize: 11, fontFamily: 'Poppins'),
+  //                               ),
+  //                               items: semesters
+  //                                   .map((semester) => DropdownMenuItem<String>(
+  //                                         value: semester,
+  //                                         child: Text(
+  //                                           semester,
+  //                                           style: const TextStyle(
+  //                                             fontFamily: 'Poppins',
+  //                                             fontSize: 10,
+  //                                           ),
+  //                                         ),
+  //                                       ))
+  //                                   .toList(),
+  //                               value: semesters.contains(selectedSem)
+  //                                   ? selectedSem
+  //                                   : null,
+  //                               onChanged: (String? newValue) {
+  //                                 setState(() {
+  //                                   selectedSem = newValue ?? '';
+  //                                   for (var each in enInfoData) {
+  //                                     if (each.semester == newValue) {
+  //                                       semid = each.semid;
+  //                                       syid = each.syid;
+  //                                       getGrades(each.semid);
+  //                                       break;
+  //                                     }
+  //                                   }
+  //                                 });
+  //                               },
+  //                             )
+  //                           : const CircularProgressIndicator(),
+  //                     ),
+  //                 ],
+  //               ),
+  //               const SizedBox(
+  //                 height: 20,
+  //               ),
+  //               LayoutBuilder(
+  //                 builder: (context, constraints) {
+  //                   return SingleChildScrollView(
+  //                     scrollDirection: Axis.horizontal,
+  //                     child: ConstrainedBox(
+  //                       constraints: BoxConstraints(
+  //                         minWidth: constraints.maxWidth,
+  //                       ),
+  //                       child: DataTable(
+  //                         columnSpacing: 30.0,
+  //                         columns: [
+  //                           const DataColumn(
+  //                               label: Text(
+  //                             'Code',
+  //                             style: TextStyle(
+  //                               fontSize: 11,
+  //                             ),
+  //                           )),
+  //                           DataColumn(
+  //                             label: MergeSemantics(
+  //                               child: SizedBox(
+  //                                 width: 112,
+  //                                 child: Column(
+  //                                   mainAxisAlignment: MainAxisAlignment.center,
+  //                                   children: [
+  //                                     if (gradelevel >= 17 || gradelevel == 0)
+  //                                       const Text(
+  //                                         'Subject Description',
+  //                                         style: TextStyle(
+  //                                           fontSize: 11,
+  //                                         ),
+  //                                         overflow: TextOverflow.ellipsis,
+  //                                         maxLines: 2,
+  //                                       ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const DataColumn(
+  //                             label: Expanded(
+  //                               child: Text(
+  //                                 'Prelim',
+  //                                 style: TextStyle(
+  //                                   fontSize: 11,
+  //                                 ),
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 maxLines: 2,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const DataColumn(
+  //                             label: Expanded(
+  //                               child: Text(
+  //                                 'Midterm',
+  //                                 style: TextStyle(
+  //                                   fontSize: 11,
+  //                                 ),
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 maxLines: 2,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const DataColumn(
+  //                             label: Expanded(
+  //                               child: Text(
+  //                                 'PreFinal',
+  //                                 style: TextStyle(
+  //                                   fontSize: 11,
+  //                                 ),
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 maxLines: 2,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const DataColumn(
+  //                             label: Expanded(
+  //                               child: Text(
+  //                                 'Final',
+  //                                 style: TextStyle(
+  //                                   fontSize: 11,
+  //                                 ),
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 maxLines: 2,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const DataColumn(
+  //                             label: Expanded(
+  //                               child: Text(
+  //                                 'Final\nGrade',
+  //                                 style: TextStyle(
+  //                                   fontSize: 11,
+  //                                 ),
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 maxLines: 2,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const DataColumn(
+  //                             label: Expanded(
+  //                               child: Text(
+  //                                 'Remarks',
+  //                                 style: TextStyle(
+  //                                   fontSize: 11,
+  //                                 ),
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 maxLines: 2,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ],
+  //                         rows: concatenatedArray.asMap().entries.map((entry) {
+  //                           final index = entry.key;
+  //                           final grade = entry.value;
+  //                           final isEvenRow = index % 2 == 0;
+  //                           final rowColor =
+  //                               isEvenRow ? Colors.grey.shade200 : Colors.white;
+
+  //                           return DataRow(
+  //                               color: WidgetStateColor.resolveWith(
+  //                                   (states) => rowColor),
+  //                               cells: [
+  //                                 DataCell(
+  //                                   Container(
+  //                                     width: 80,
+  //                                     child: Text(
+  //                                       grade.subjcode,
+  //                                       style: TextStyle(
+  //                                         fontSize: 10,
+  //                                       ),
+  //                                       overflow: TextOverflow.ellipsis,
+  //                                       maxLines: 3,
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                                 DataCell(
+  //                                   Column(
+  //                                     mainAxisAlignment:
+  //                                         MainAxisAlignment.center,
+  //                                     crossAxisAlignment:
+  //                                         CrossAxisAlignment.center,
+  //                                     children: [
+  //                                       if (gradelevel >= 17)
+  //                                         Container(
+  //                                           width: 200,
+  //                                           child: Text(
+  //                                             grade.subjdesc,
+  //                                             style: TextStyle(
+  //                                               fontSize: 10,
+  //                                             ),
+  //                                             overflow: TextOverflow.ellipsis,
+  //                                             maxLines: 3,
+  //                                           ),
+  //                                         ),
+  //                                     ],
+  //                                   ),
+  //                                 ),
+  //                                 DataCell(Text(
+  //                                   grade.prelemgrade.isNotEmpty
+  //                                       ? grade.prelemgrade
+  //                                       : '',
+  //                                   style: TextStyle(
+  //                                     fontSize: 11,
+  //                                   ),
+  //                                 )),
+  //                                 DataCell(Text(
+  //                                   grade.midtermgrade.isNotEmpty
+  //                                       ? grade.midtermgrade
+  //                                       : '',
+  //                                   style: TextStyle(
+  //                                     fontSize: 11,
+  //                                   ),
+  //                                 )),
+  //                                 DataCell(Text(
+  //                                     grade.prefigrade.isNotEmpty
+  //                                         ? grade.prefigrade
+  //                                         : '',
+  //                                     style: TextStyle(
+  //                                       fontSize: 11,
+  //                                     ))),
+  //                                 DataCell(Text(
+  //                                   grade.finalgrade.isNotEmpty
+  //                                       ? grade.finalgrade
+  //                                       : '',
+  //                                   style: TextStyle(
+  //                                     fontSize: 11,
+  //                                   ),
+  //                                 )),
+  //                                 DataCell(Text(
+  //                                   grade.fg.isNotEmpty ? grade.fg : '',
+  //                                   style: TextStyle(
+  //                                     fontSize: 11,
+  //                                   ),
+  //                                 )),
+  //                                 DataCell(
+  //                                   Text(
+  //                                     grade.fgremarks.toString().isNotEmpty
+  //                                         ? grade.fgremarks
+  //                                         : '',
+  //                                     style: TextStyle(
+  //                                       fontSize: 11,
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                               ]);
+  //                         }).toList(),
+  //                       ),
+  //                     ),
+  //                   );
+  //                 },
+  //               ),
+  //             ],
+  //           ),
+  //   );
+  // }
 
   Widget _buildAttendance() {
     return const Padding(

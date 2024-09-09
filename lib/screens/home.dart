@@ -24,6 +24,7 @@ import 'scholarship_request.dart';
 import 'package:pushtrial/models/school_info.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen>
   int studid = 0;
   int id = 0;
   String userFirstName = '';
-  // List<TapHistory> data = [];
+
   String? notificationMessage;
   List<String> notifications = [];
   List<SMS> sms = [];
@@ -107,6 +108,7 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
     );
     _checkAndNotifyFuture = _initializeData();
+    _initializeData();
   }
 
   Future<void> _initializeData() async {
@@ -291,7 +293,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     _animationController.dispose();
-    // _timer.cancel();
+
     super.dispose();
   }
 
@@ -319,7 +321,14 @@ class _HomeScreenState extends State<HomeScreen>
                   height: 100,
                 ),
                 color: Colors.white,
-                onPressed: () {},
+                onPressed: () async {
+                  await _initializeData();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Data refreshed'),
+                    ),
+                  );
+                },
               ),
               actions: [
                 IconButton(
@@ -445,21 +454,20 @@ class _HomeScreenState extends State<HomeScreen>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => NotificationsScreen(
-                                    // onNotificationsViewed: () {
-                                    //   setState(() {});
-                                    // },
-                                    ),
+                                builder: (context) => NotificationsScreen(),
                               ),
                             );
                           },
-                          child: Center(
-                            child: Text(
-                              'View All Notifications',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: schoolColor,
+                          child: Container(
+                            width: double.infinity,
+                            child: Center(
+                              child: Text(
+                                'View All Notifications',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: schoolColor,
+                                ),
                               ),
                             ),
                           ),

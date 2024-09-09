@@ -54,6 +54,18 @@ class EnrollmentScreenState extends State<EnrollmentScreen> {
     return Color(int.parse(buffer.toString(), radix: 16));
   }
 
+  Future<void> _refreshData() async {
+    setState(() {
+      loading = true;
+    });
+    await getUser();
+    await getUserInfo();
+    await getSchoolInfo();
+    setState(() {
+      loading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

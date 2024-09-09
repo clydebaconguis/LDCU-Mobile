@@ -482,7 +482,6 @@ class _ClassScheduleCollegeScreenState
 
                   DropdownButtonFormField2<String>(
                     decoration: InputDecoration(
-                      // border: OutlineInputBorder(),
                       labelText: 'Select Day',
                       labelStyle: TextStyle(
                         fontFamily: 'Poppins',
@@ -527,11 +526,9 @@ class _ClassScheduleCollegeScreenState
                         return Container(
                           margin: const EdgeInsets.only(bottom: 16.0),
                           decoration: BoxDecoration(
-                            // borderRadius: BorderRadius.circular(20),
                             color: Colors.grey[200],
                           ),
                           child: ClipRRect(
-                            // borderRadius: BorderRadius.circular(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -551,7 +548,6 @@ class _ClassScheduleCollegeScreenState
                                                 color: Colors.white,
                                                 fontSize: 13,
                                                 fontFamily: 'Poppins',
-                                                // fontWeight: FontWeight.bold,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 3,

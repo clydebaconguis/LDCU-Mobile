@@ -18,6 +18,7 @@ class _CreditCardState extends State<CreditCard> {
   int syid = 1;
   int semid = 1;
   String selectedYear = '';
+  String selectedSem = '';
   List<String> years = [];
   List<Ledger> data = [];
   List<EnrollmentInfo> enInfoData = [];
@@ -89,10 +90,10 @@ class _CreditCardState extends State<CreditCard> {
                       top: 16,
                       right: 16,
                       child: Text(
-                        "SY: $syDesc",
+                        "SY: $syDesc\n   $sem",
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 15,
                           fontFamily: 'Poppins',
                         ),
                       ),
@@ -189,15 +190,23 @@ class _CreditCardState extends State<CreditCard> {
             list.map((model) => EnrollmentInfo.fromJson(model)).toList();
 
         years = enInfoData.map((e) => e.sydesc).toSet().toList();
-        selectedYear = enInfoData.last.sydesc;
 
-        var latestInfo =
-            enInfoData.firstWhere((element) => element.sydesc == selectedYear);
-        syid = latestInfo.syid;
-        semid = latestInfo.semid;
+        if (enInfoData.isNotEmpty) {
+          selectedYear = enInfoData.last.sydesc;
+          selectedSem = enInfoData.last.semester;
 
-        syDesc = selectedYear;
-        getLedger();
+          var latestInfo = enInfoData.firstWhere(
+            (element) => element.sydesc == selectedYear,
+            orElse: () => enInfoData.first,
+          );
+
+          syid = latestInfo.syid;
+          semid = latestInfo.semid;
+
+          syDesc = selectedYear;
+          sem = selectedSem;
+          getLedger();
+        }
       });
     });
   }

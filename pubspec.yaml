@@ -66,6 +66,7 @@ dependencies:
   flutter_file_downloader: ^2.0.0
   flutter_pdfview: ^1.2.7
   auto_size_text: ^3.0.0
+  custom_refresh_indicator: ^4.0.1
 
 dev_dependencies:
   flutter_test:
