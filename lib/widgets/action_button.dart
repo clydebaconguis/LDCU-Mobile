@@ -9,6 +9,7 @@ import 'package:pushtrial/models/enrollment_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/class_schedule.dart';
 import '../screens/class_schedule_college.dart';
+import '../screens/class_schedule_seniorhigh.dart';
 import '../screens/remedial_class.dart';
 import 'dart:convert';
 import 'package:pushtrial/models/school_info.dart';
@@ -93,11 +94,19 @@ class ActionButtonsState extends State<ActionButtons> {
               onPressed: () {
                 EnrollmentInfo? latestInfo = getSelectedEnrollmentInfo();
                 if (latestInfo != null) {
-                  if (latestInfo.levelid >= 14) {
+                  if (latestInfo.levelid >= 17) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => ClassScheduleCollegeScreen()),
+                    );
+                  } else if (latestInfo.levelid == 14 ||
+                      latestInfo.levelid == 15) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ClassScheduleSeniorHighScreen()),
                     );
                   } else {
                     Navigator.push(

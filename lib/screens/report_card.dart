@@ -8,6 +8,8 @@ import 'package:pushtrial/models/grades.dart';
 import '../widgets/studentattendance.dart';
 import '../widgets/observedvalues.dart';
 import 'package:pushtrial/models/school_info.dart';
+import 'package:pushtrial/models/year_sem.dart';
+import 'package:pushtrial/models/enrolled_stud.dart';
 
 class ReportCard extends StatefulWidget {
   const ReportCard({super.key});
@@ -18,16 +20,10 @@ class ReportCard extends StatefulWidget {
 
 class _ReportCardState extends State<ReportCard> {
   Color mainClr = Colors.white;
-  @override
-  void initState() {
-    getSchoolInfo();
-    getUser();
-    super.initState();
-  }
 
   var id = '0';
   var studid = '0';
-  var syid = 0;
+  var syid = 1;
   var semid = 0;
   var gradelevel = 0;
   var sectionid = 0;
@@ -40,6 +36,10 @@ class _ReportCardState extends State<ReportCard> {
   List<Grades> finalGrade = [];
   List<EnrollmentInfo> enInfoData = [];
   List<Grades> concatenatedArray = [];
+  List<SchoolYear> schoolYear = [];
+  List<Sem> schoolSem = [];
+  List<EnrolledStud> enrolledstud = [];
+  bool loading = true;
 
   List<SchoolInfo> schoolInfo = [];
   Color schoolColor = const Color.fromARGB(0, 255, 255, 255);
@@ -157,6 +157,52 @@ class _ReportCardState extends State<ReportCard> {
     });
   }
 
+  getYearandSem() async {
+    final response = await CallApi().getYearandSem();
+    final Map<String, dynamic> responseData = json.decode(response.body);
+
+    schoolYear = (responseData['sy'] as List)
+        .map((data) => SchoolYear.fromJson(data))
+        .toList();
+    schoolSem = (responseData['semester'] as List)
+        .map((data) => Sem.fromJson(data))
+        .toList();
+
+    schoolYear.sort((a, b) => a.sydesc.compareTo(b.sydesc));
+
+    if (schoolYear.isNotEmpty) {
+      selectedYear = selectedYear != null &&
+              schoolYear.any((year) => year.id.toString() == selectedYear)
+          ? selectedYear
+          : schoolYear.first.id.toString();
+    }
+
+    if (schoolSem.isNotEmpty) {
+      selectedSem = selectedSem != null &&
+              schoolSem.any((sem) => sem.id.toString() == selectedSem)
+          ? selectedSem
+          : schoolSem.first.id.toString();
+    }
+
+    setState(() {});
+  }
+
+  getEnrolledStud() async {
+    await CallApi().getEnrolledStud(id).then((response) {
+      setState(() {
+        var decodedJson = json.decode(response.body);
+
+        if (decodedJson is Map<String, dynamic>) {
+          Iterable list = decodedJson['enrolledstud_info'];
+          enrolledstud =
+              list.map((model) => EnrolledStud.fromJson(model)).toList();
+        }
+
+        print('enrolledstud: $enrolledstud');
+      });
+    });
+  }
+
   getEnrollment() async {
     await CallApi().getEnrollmentInfo(id).then((response) {
       setState(() {
@@ -176,16 +222,34 @@ class _ReportCardState extends State<ReportCard> {
         var lastindex = enInfoData[enInfoData.length - 1];
 
         setState(() {
-          syid = lastindex.syid;
-          semid = 1;
           gradelevel = lastindex.levelid;
-          sectionid = lastindex.sectionid;
-          strand = lastindex.strandid;
         });
 
         print('Enrollement Data: $enInfoData');
         getGrades(1);
       });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    setState(() {
+      loading = true;
+    });
+
+    await getUser();
+    await getSchoolInfo();
+    getYearandSem();
+    await getEnrollment();
+    getEnrolledStud();
+
+    setState(() {
+      loading = false;
     });
   }
 
@@ -222,7 +286,7 @@ class _ReportCardState extends State<ReportCard> {
                   child: TabBar(
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: BoxDecoration(
-                      color: const Color.fromARGB(255, 219, 154, 149),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelColor: Colors.black,
@@ -269,11 +333,7 @@ class _ReportCardState extends State<ReportCard> {
                         border: OutlineInputBorder(),
                       ),
                       isExpanded: true,
-                      hint: const Text(
-                        'Choose a school year',
-                        style: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
-                      ),
-                      value: selectedYear,
+                      value: null,
                       onChanged: (String? newValue) {
                         setState(() {
                           selectedYear = newValue!;

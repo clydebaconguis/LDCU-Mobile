@@ -36,6 +36,9 @@ class UserData {
     isguardiannum: 0,
     levelid: 0,
     sectionid: 0,
+    semail: '',
+    nationalityDesc: '',
+    courseDesc: '',
   );
 
   static Future init() async =>

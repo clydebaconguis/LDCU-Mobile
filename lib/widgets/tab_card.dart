@@ -135,8 +135,8 @@ class TabCardState extends State<TabCard> {
     final sectionText = latestInfo.sectionname != "Not Found"
         ? "Section: ${latestInfo.sectionname}\n"
         : '';
-    final courseText = latestInfo.courseDesc.isNotEmpty
-        ? "Course: ${latestInfo.courseDesc}\n"
+    final courseText = latestInfo.courseabrv.isNotEmpty
+        ? "Course: ${latestInfo.courseabrv}\n"
         : '';
 
     return Padding(

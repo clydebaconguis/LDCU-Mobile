@@ -103,10 +103,10 @@ class _LoginState extends State<LoginScreen> {
               await prefs.setString(
                   'userlogin', jsonEncode(userLogin.toJson()));
 
-              String? token = await PushNotifications.getFCMToken();
-              if (token != null) {
-                await _callApi.getSaveToken(user.id, userLogin.type, token);
-              }
+              // String? token = await PushNotifications.getFCMToken();
+              // if (token != null) {
+              //   await _callApi.getSaveToken(user.id, userLogin.type, token);
+              // }
 
               Navigator.pushReplacementNamed(context, '/home', arguments: user);
             } else {

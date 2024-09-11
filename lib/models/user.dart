@@ -23,7 +23,6 @@ class User {
   String? contactno;
   String? semail;
   int? levelid;
-
   String? picurl;
   String? street;
   String? barangay;
@@ -32,6 +31,8 @@ class User {
   int ismothernum;
   int isfathernum;
   int isguardiannum;
+  String? nationalityDesc;
+  String? courseDesc;
 
   User({
     this.id = 0,
@@ -66,6 +67,8 @@ class User {
     this.ismothernum = 0,
     this.isfathernum = 0,
     this.isguardiannum = 0,
+    this.nationalityDesc,
+    this.courseDesc,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -102,6 +105,8 @@ class User {
       ismothernum: json['ismothernum'] ?? 0,
       isfathernum: json['isfathernum'] ?? 0,
       isguardiannum: json['isguardiannum'] ?? 0,
+      nationalityDesc: json['nationalityDesc'] ?? '',
+      courseDesc: json['courseDesc'] ?? '',
     );
   }
 
@@ -139,11 +144,13 @@ class User {
       'ismothernum': ismothernum,
       'isfathernum': isfathernum,
       'isguardiannum': isguardiannum,
+      'nationalityDesc': nationalityDesc,
+      'courseDesc': courseDesc,
     };
   }
 
   @override
   String toString() {
-    return 'User{id: $id, sectionid: $sectionid, userid: $userid, lrn: $lrn, firstname: $firstname, middlename: $middlename, lastname: $lastname, suffix: $suffix, sid: $sid, fathername: $fathername, fcontactno: $fcontactno, foccupation: $foccupation, mothername: $mothername, mcontactno: $mcontactno, moccupation: $moccupation, guardianname: $guardianname, gcontactno: $gcontactno, guardianrelation: $guardianrelation, dob: $dob, gender: $gender, nationality: $nationality, contactno: $contactno, semail: $semail, levelid: $levelid, picurl: $picurl, street: $street, barangay: $barangay, city: $city, province: $province, ismothernum: $ismothernum, isfathernum: $isfathernum, isguardiannum: $isguardiannum}';
+    return 'User{id: $id, sectionid: $sectionid, userid: $userid, lrn: $lrn, firstname: $firstname, middlename: $middlename, lastname: $lastname, suffix: $suffix, sid: $sid, fathername: $fathername, fcontactno: $fcontactno, foccupation: $foccupation, mothername: $mothername, mcontactno: $mcontactno, moccupation: $moccupation, guardianname: $guardianname, gcontactno: $gcontactno, guardianrelation: $guardianrelation, dob: $dob, gender: $gender, nationality: $nationality, contactno: $contactno, semail: $semail, levelid: $levelid, picurl: $picurl, street: $street, barangay: $barangay, city: $city, province: $province, ismothernum: $ismothernum, isfathernum: $isfathernum, isguardiannum: $isguardiannum, nationalityDesc: $nationalityDesc, courseDesc: $courseDesc}';
   }
 }

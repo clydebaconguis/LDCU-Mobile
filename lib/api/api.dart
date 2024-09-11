@@ -349,6 +349,8 @@ class CallApi {
   final String _scholarhip = "/api/mobile/api_getscholarship";
   final String _requirement = "/api/mobile/api_getrequirement";
   final String _deleteScholarship = "/api/mobile/api_delscholarship";
+  final String _yearSem = "/api/mobile/api_sysem";
+  final String _enrolledStud = "/api/mobile/api_enrolledstud";
 
   CallApi() {
     _initializeMainDomain();
@@ -367,6 +369,22 @@ class CallApi {
         print('Main domain not initialized');
       }
     }
+  }
+
+  getEnrolledStud(studid) async {
+    await _ensureDomainInitialized();
+    var fullUrl = '$_mainDomain$_enrolledStud?studid=$studid';
+    return await http.get(
+      Uri.parse(fullUrl),
+    );
+  }
+
+  getYearandSem() async {
+    await _ensureDomainInitialized();
+    var fullUrl = '$_mainDomain$_yearSem';
+    return await http.get(
+      Uri.parse(fullUrl),
+    );
   }
 
   getDeleteScholarship(id) async {
