@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pushtrial/models/school_info.dart';
+import 'package:pushtrial/models/enrollment_info.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class ObservedValuesScreen extends StatefulWidget {
   const ObservedValuesScreen({super.key});
@@ -15,10 +17,14 @@ class ObservedValuesScreen extends StatefulWidget {
 
 class _ObservedValuesState extends State<ObservedValuesScreen> {
   String studid = '0';
+  int syid = 0;
   List<RatingValues> _ratingValues = [];
   List<Setup> _setup = [];
   List<StudentObservedValues> _studentObservedValues = [];
-
+  List<EnrollmentInfo> enInfoData = [];
+  var gradelevel = 0;
+  String selectedYear = '';
+  List<String> years = [];
   bool loading = true;
 
   List<SchoolInfo> schoolInfo = [];
@@ -60,10 +66,35 @@ class _ObservedValuesState extends State<ObservedValuesScreen> {
     });
 
     await getUser();
-    await getObservedValues();
+    await getEnrollment();
 
     setState(() {
       loading = false;
+    });
+  }
+
+  getEnrollment() async {
+    await CallApi().getEnrollmentInfo(studid).then((response) {
+      setState(() {
+        Iterable list = json.decode(response.body);
+
+        enInfoData = list.map((model) {
+          return EnrollmentInfo.fromJson(model);
+        }).toList();
+
+        for (var element in enInfoData) {
+          years.add(element.sydesc);
+        }
+        Set<String> uniqueSet = years.toSet();
+        years = uniqueSet.toList();
+
+        selectedYear = enInfoData[enInfoData.length - 1].sydesc;
+        var lastindex = enInfoData[enInfoData.length - 1];
+
+        setState(() {
+          gradelevel = lastindex.levelid;
+        });
+      });
     });
   }
 
@@ -79,7 +110,7 @@ class _ObservedValuesState extends State<ObservedValuesScreen> {
   }
 
   Future<void> getObservedValues() async {
-    final response = await CallApi().getObservedValues(studid);
+    final response = await CallApi().getObservedValues(studid, syid);
     final Map<String, dynamic> responseData = json.decode(response.body);
 
     _ratingValues = (responseData['ob_rv'] as List)
@@ -95,9 +126,6 @@ class _ObservedValuesState extends State<ObservedValuesScreen> {
         .toList();
 
     setState(() {});
-    // print('Rating values: $_ratingValues');
-    // print('Setup: $_setup');
-    // print('Student observed values: $_studentObservedValues');
   }
 
   @override
@@ -109,140 +137,187 @@ class _ObservedValuesState extends State<ObservedValuesScreen> {
               size: 100,
             ),
           )
-        : Padding(
-            padding: EdgeInsets.all(0.0),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: constraints.maxWidth,
+        : Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButtonFormField2<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'School Year',
+                    labelStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                  isExpanded: true,
+                  value: null,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedYear = newValue!;
+
+                      for (var yr in enInfoData) {
+                        if (yr.sydesc == selectedYear) {
+                          syid = yr.syid;
+                          getObservedValues();
+                        }
+                      }
+                    });
+                  },
+                  items: years.map<DropdownMenuItem<String>>((String year) {
+                    return DropdownMenuItem<String>(
+                      value: year,
+                      child: Text(
+                        year,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                        ),
                       ),
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(
-                            label: Text(
-                              'Description',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 11,
+                    );
+                  }).toList(),
+                ),
+              ),
+              if (selectedYear.isNotEmpty)
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(0.0),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minWidth: constraints.maxWidth,
                               ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Q1',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Q2',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Q3',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Q4',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ),
-                        ],
-                        rows: _setup.map((setup) {
-                          final studentObserved =
-                              _studentObservedValues.firstWhere(
-                            (obs) => obs.gsdid == setup.id,
-                            orElse: () => StudentObservedValues(
-                              gsdid: setup.id,
-                              q1eval: 0,
-                              q2eval: 0,
-                              q3eval: 0,
-                              q4eval: 0,
-                            ),
-                          );
-
-                          String getRatingValue(int evalId) {
-                            return _ratingValues
-                                .firstWhere(
-                                  (rating) => rating.id == evalId,
-                                  orElse: () => RatingValues(
-                                    id: 0,
-                                    sort: '',
-                                    gsid: 0,
-                                    description: '',
-                                    value: '',
-                                  ),
-                                )
-                                .value;
-                          }
-
-                          return DataRow(
-                            cells: [
-                              DataCell(
-                                Container(
-                                  width: 300,
-                                  child: Text(
-                                    setup.description,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 11,
+                              child: DataTable(
+                                columns: const [
+                                  DataColumn(
+                                    label: Text(
+                                      'Description',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        fontSize: 11,
+                                      ),
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 3,
                                   ),
-                                ),
+                                  DataColumn(
+                                    label: Text(
+                                      'Q1',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                  DataColumn(
+                                    label: Text(
+                                      'Q2',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                  DataColumn(
+                                    label: Text(
+                                      'Q3',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                  DataColumn(
+                                    label: Text(
+                                      'Q4',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                rows: _setup.map((setup) {
+                                  final studentObserved =
+                                      _studentObservedValues.firstWhere(
+                                    (obs) => obs.gsdid == setup.id,
+                                    orElse: () => StudentObservedValues(
+                                      gsdid: setup.id,
+                                      q1eval: 0,
+                                      q2eval: 0,
+                                      q3eval: 0,
+                                      q4eval: 0,
+                                    ),
+                                  );
+
+                                  String getRatingValue(int evalId) {
+                                    return _ratingValues
+                                        .firstWhere(
+                                          (rating) => rating.id == evalId,
+                                          orElse: () => RatingValues(
+                                            id: 0,
+                                            sort: '',
+                                            gsid: 0,
+                                            description: '',
+                                            value: '',
+                                          ),
+                                        )
+                                        .value;
+                                  }
+
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(
+                                        Container(
+                                          width: 300,
+                                          child: Text(
+                                            setup.description,
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 11,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 3,
+                                          ),
+                                        ),
+                                      ),
+                                      DataCell(Text(
+                                        getRatingValue(studentObserved.q1eval),
+                                        softWrap: false,
+                                      )),
+                                      DataCell(Text(
+                                        getRatingValue(studentObserved.q2eval),
+                                        softWrap: false,
+                                      )),
+                                      DataCell(Text(
+                                        getRatingValue(studentObserved.q3eval),
+                                        softWrap: false,
+                                      )),
+                                      DataCell(Text(
+                                        getRatingValue(studentObserved.q4eval),
+                                        softWrap: false,
+                                      )),
+                                    ],
+                                  );
+                                }).toList(),
                               ),
-                              DataCell(Text(
-                                getRatingValue(studentObserved.q1eval),
-                                softWrap: false,
-                              )),
-                              DataCell(Text(
-                                getRatingValue(studentObserved.q2eval),
-                                softWrap: false,
-                              )),
-                              DataCell(Text(
-                                getRatingValue(studentObserved.q3eval),
-                                softWrap: false,
-                              )),
-                              DataCell(Text(
-                                getRatingValue(studentObserved.q4eval),
-                                softWrap: false,
-                              )),
-                            ],
-                          );
-                        }).toList(),
-                      ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+            ],
           );
   }
 }

@@ -226,7 +226,7 @@ class _ReportCardState extends State<ReportCard> {
         });
 
         print('Enrollement Data: $enInfoData');
-        getGrades(1);
+        // getGrades(1);
       });
     });
   }

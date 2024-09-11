@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:pushtrial/api/api.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pushtrial/models/school_info.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class StudentAttendanceScreen extends StatefulWidget {
   const StudentAttendanceScreen({super.key});
@@ -51,6 +52,27 @@ class _StudentAttendanceState extends State<StudentAttendanceScreen> {
     }
   }
 
+  getEnrollment() async {
+    await CallApi().getEnrollmentInfo(studid).then((response) {
+      setState(() {
+        Iterable list = json.decode(response.body);
+
+        enInfoData = list.map((model) {
+          return EnrollmentInfo.fromJson(model);
+        }).toList();
+
+        for (var element in enInfoData) {
+          years.add(element.sydesc);
+        }
+        Set<String> uniqueSet = years.toSet();
+        years = uniqueSet.toList();
+
+        selectedYear = enInfoData[enInfoData.length - 1].sydesc;
+        var lastindex = enInfoData[enInfoData.length - 1];
+      });
+    });
+  }
+
   @override
   void initState() {
     getSchoolInfo();
@@ -64,7 +86,7 @@ class _StudentAttendanceState extends State<StudentAttendanceScreen> {
     });
 
     await getUser();
-    await getStudentAttendance();
+    await getEnrollment();
 
     setState(() {
       loading = false;
@@ -83,7 +105,7 @@ class _StudentAttendanceState extends State<StudentAttendanceScreen> {
   }
 
   Future<void> getStudentAttendance() async {
-    final response = await CallApi().getStudentAttendance(studid);
+    final response = await CallApi().getStudentAttendance(studid, syid);
 
     if (response.body is List) {
       attendance = (response.body as List)
@@ -98,8 +120,6 @@ class _StudentAttendanceState extends State<StudentAttendanceScreen> {
     }
 
     setState(() {});
-
-    // print('Retrieved attendance: $attendance');
   }
 
   @override
@@ -116,92 +136,139 @@ class _StudentAttendanceState extends State<StudentAttendanceScreen> {
               size: 100,
             ),
           )
-        : Padding(
-            padding: EdgeInsets.all(0.0),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: constraints.maxWidth,
-                      ),
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(
-                              label: Text('Months',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 11,
-                                  ))),
-                          DataColumn(
-                              label: Text('No. of\nSchool\nDays',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 11,
-                                  ))),
-                          DataColumn(
-                              label: Text('No. of\nDays\nPresent',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 11,
-                                  ))),
-                          DataColumn(
-                              label: Text('No. of\nDays\nAbsent',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 11,
-                                  ))),
-                        ],
-                        rows: [
-                          ...attendance.map((Attendance record) {
-                            return DataRow(cells: [
-                              DataCell(Text(record.monthdesc,
-                                  style: TextStyle(fontSize: 12))),
-                              DataCell(Text(record.days.toString(),
-                                  style: TextStyle(fontSize: 11))),
-                              DataCell(Text(record.present.toString(),
-                                  style: TextStyle(fontSize: 11))),
-                              DataCell(Text(record.absent.toString(),
-                                  style: TextStyle(fontSize: 11))),
-                            ]);
-                          }).toList(),
-                          DataRow(
-                            cells: [
-                              const DataCell(Text(
-                                'TOTAL',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              )),
-                              DataCell(Text(
-                                totalDays.toString(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              )),
-                              DataCell(Text(
-                                totalPresent.toString(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              )),
-                              DataCell(Text(
-                                totalAbsent.toString(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              )),
-                            ],
-                          ),
-                        ],
-                      ),
+        : Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButtonFormField2<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'School Year',
+                    labelStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
+                    border: OutlineInputBorder(),
                   ),
-                );
-              },
-            ),
+                  isExpanded: true,
+                  value: null,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedYear = newValue!;
+
+                      for (var yr in enInfoData) {
+                        if (yr.sydesc == selectedYear) {
+                          syid = yr.syid;
+                          getStudentAttendance();
+                        }
+                      }
+                    });
+                  },
+                  items: years.map<DropdownMenuItem<String>>((String year) {
+                    return DropdownMenuItem<String>(
+                      value: year,
+                      child: Text(
+                        year,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(0.0),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: constraints.maxWidth,
+                            ),
+                            child: DataTable(
+                              columns: const [
+                                DataColumn(
+                                    label: Text('Months',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 11,
+                                        ))),
+                                DataColumn(
+                                    label: Text('No. of\nSchool\nDays',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 11,
+                                        ))),
+                                DataColumn(
+                                    label: Text('No. of\nDays\nPresent',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 11,
+                                        ))),
+                                DataColumn(
+                                    label: Text('No. of\nDays\nAbsent',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 11,
+                                        ))),
+                              ],
+                              rows: [
+                                ...attendance.map((Attendance record) {
+                                  return DataRow(cells: [
+                                    DataCell(Text(record.monthdesc,
+                                        style: TextStyle(fontSize: 12))),
+                                    DataCell(Text(record.days.toString(),
+                                        style: TextStyle(fontSize: 11))),
+                                    DataCell(Text(record.present.toString(),
+                                        style: TextStyle(fontSize: 11))),
+                                    DataCell(Text(record.absent.toString(),
+                                        style: TextStyle(fontSize: 11))),
+                                  ]);
+                                }).toList(),
+                                DataRow(
+                                  cells: [
+                                    const DataCell(Text(
+                                      'TOTAL',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                                    DataCell(Text(
+                                      totalDays.toString(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                                    DataCell(Text(
+                                      totalPresent.toString(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                                    DataCell(Text(
+                                      totalAbsent.toString(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           );
   }
 }

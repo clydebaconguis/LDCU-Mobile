@@ -68,7 +68,6 @@ class _AttendanceState extends State<AttendanceScreen> {
             // print("has match");
             syid = yr.syid;
             levelid = yr.levelid;
-            getAttendance();
           }
         }
       });

@@ -419,17 +419,17 @@ class CallApi {
     );
   }
 
-  getObservedValues(studid) async {
+  getObservedValues(studid, syid) async {
     await _ensureDomainInitialized();
-    var fullUrl = '$_mainDomain$_observedValues?studid=$studid';
+    var fullUrl = '$_mainDomain$_observedValues?studid=$studid&syid=$syid';
     return await http.get(
       Uri.parse(fullUrl),
     );
   }
 
-  getStudentAttendance(studid) async {
+  getStudentAttendance(studid, syid) async {
     await _ensureDomainInitialized();
-    var fullUrl = '$_mainDomain$_studentAttendance?studid=$studid';
+    var fullUrl = '$_mainDomain$_studentAttendance?studid=$studid&syid=$syid';
     return await http.get(
       Uri.parse(fullUrl),
     );
@@ -561,7 +561,7 @@ class CallApi {
   ) async {
     await _ensureDomainInitialized();
     var fullUrl =
-        '$_mainDomain$_attendance?studid=$studid&syid=$syid&levelid=$levelid&semid=1';
+        '$_mainDomain$_attendance?studid=$studid&syid=$syid&levelid=$levelid';
     return await http.get(
       Uri.parse(fullUrl),
     );
