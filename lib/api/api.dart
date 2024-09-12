@@ -690,7 +690,9 @@ class CallApi {
   }
 
   getDomain() async {
-    return _mainDomain;
+    await _ensureDomainInitialized();
+    var fullUrl = '$_mainDomain';
+    return fullUrl;
   }
 
   getPublicData(apiUrl) async {

@@ -171,15 +171,14 @@ class _ReportCardSeniorHighState extends State<ReportCardSeniorHigh> {
     schoolYear.sort((a, b) => a.sydesc.compareTo(b.sydesc));
 
     if (schoolYear.isNotEmpty) {
-      selectedYear = selectedYear != null &&
-              schoolYear.any((year) => year.id.toString() == selectedYear)
-          ? selectedYear
-          : schoolYear.first.id.toString();
+      selectedYear =
+          schoolYear.any((year) => year.id.toString() == selectedYear)
+              ? selectedYear
+              : schoolYear.first.id.toString();
     }
 
     if (schoolSem.isNotEmpty) {
-      selectedSem = selectedSem != null &&
-              schoolSem.any((sem) => sem.id.toString() == selectedSem)
+      selectedSem = schoolSem.any((sem) => sem.id.toString() == selectedSem)
           ? selectedSem
           : schoolSem.first.id.toString();
     }

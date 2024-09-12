@@ -123,6 +123,7 @@ class ScholarshipFormScreenState extends State<ScholarshipFormScreen> {
     final fullUrl = '$baseUrl$relativeUrl';
 
     print('Attempting to launch URL: $fullUrl');
+
     final uri = Uri.parse(fullUrl);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
