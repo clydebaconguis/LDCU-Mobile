@@ -191,9 +191,6 @@ class _ClassScheduleSeniorHighScreenState
 
         print('enInfoData: $enInfoData');
 
-        Set<String> uniqueSet = years.toSet();
-        years = uniqueSet.toList();
-
         for (var yr in enInfoData) {
           setState(() {
             levelid = yr.levelid;
@@ -302,7 +299,7 @@ class _ClassScheduleSeniorHighScreenState
                     children: [
                       Expanded(
                         child: DropdownButtonFormField2<String>(
-                          value: selectedYear,
+                          value: null,
                           items: schoolYear
                               .map((option) => DropdownMenuItem(
                                     child: Text(
@@ -316,6 +313,46 @@ class _ClassScheduleSeniorHighScreenState
                             setState(() {
                               selectedYear = value!;
                               syid = int.parse(selectedYear);
+
+                              EnrollmentInfo? selectedEnrollment =
+                                  enInfoData.firstWhere(
+                                (enrollment) => enrollment.syid == syid,
+                                orElse: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "No Schedule for this School Year",
+                                      ),
+                                      backgroundColor: schoolColor,
+                                    ),
+                                  );
+
+                                  return EnrollmentInfo(
+                                    syid: 0,
+                                    levelid: 0,
+                                    sectionid: 0,
+                                    sydesc: '',
+                                    levelname: '',
+                                    sectionname: '',
+                                    semid: 0,
+                                    dateenrolled: '',
+                                    isactive: 0,
+                                    strandid: 0,
+                                    semester: '',
+                                    strandcode: '',
+                                    courseabrv: '',
+                                    courseDesc: '',
+                                  );
+                                },
+                              );
+
+                              if (selectedEnrollment != null) {
+                                levelid = selectedEnrollment.levelid;
+                                sectionid = selectedEnrollment.sectionid;
+                              } else {
+                                levelid = 0;
+                                sectionid = 0;
+                              }
                             });
                           },
                           decoration: const InputDecoration(
@@ -333,7 +370,7 @@ class _ClassScheduleSeniorHighScreenState
                       if (levelid >= 14) ...[
                         Expanded(
                           child: DropdownButtonFormField2<String>(
-                            value: selectedSem,
+                            value: null,
                             items: schoolSem
                                 .map((option) => DropdownMenuItem(
                                       child: Text(
@@ -367,101 +404,145 @@ class _ClassScheduleSeniorHighScreenState
                     ],
                   ),
                   const SizedBox(height: 20.0),
-                  DropdownButtonFormField2<String>(
-                    decoration: InputDecoration(
-                      labelText: 'Select Day',
-                      labelStyle: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                  if (levelid == 0) ...[
+                    Expanded(
+                      child: Center(
+                        child: Image.asset(
+                          'assets/bell.png',
+                          height: 200,
+                          width: 200,
+                        ),
                       ),
                     ),
-                    isExpanded: true,
-                    value: selectedMonth,
-                    hint: const Text(
-                      'Choose a day',
-                      style: TextStyle(fontSize: 12, fontFamily: 'Poppins'),
-                    ),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedMonth = newValue!;
-                        getSchedByMonth();
-                      });
-                    },
-                    items: months.map<DropdownMenuItem<String>>(
-                      (String month) {
-                        return DropdownMenuItem<String>(
-                          value: month,
-                          child: Text(
-                            month,
-                            style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              color: Colors.black,
-                              fontSize: 15,
-                            ),
-                          ),
-                        );
+                  ] else ...[
+                    DropdownButtonFormField2<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Day',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      isExpanded: true,
+                      value: selectedMonth,
+                      hint: const Text(
+                        'Choose a day',
+                        style: TextStyle(fontSize: 12, fontFamily: 'Poppins'),
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedMonth = newValue!;
+                          getSchedByMonth();
+                        });
                       },
-                    ).toList(),
-                  ),
-                  const SizedBox(height: 20.0),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: listOfItem3.length,
-                      itemBuilder: (context, index) {
-                        final item = listOfItem3[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                          ),
-                          child: ClipRRect(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10.0),
-                                  color: schoolColor,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(2.0),
-                                            child: Text(
-                                              '${item.subject}',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 13,
-                                                fontFamily: 'Poppins',
+                      items: months.map<DropdownMenuItem<String>>(
+                        (String month) {
+                          return DropdownMenuItem<String>(
+                            value: month,
+                            child: Text(
+                              month,
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                          );
+                        },
+                      ).toList(),
+                    ),
+                    const SizedBox(height: 20.0),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: listOfItem3.length,
+                        itemBuilder: (context, index) {
+                          final item = listOfItem3[index];
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                            ),
+                            child: ClipRRect(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10.0),
+                                    color: schoolColor,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(2.0),
+                                              child: Text(
+                                                '${item.subject}',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 13,
+                                                  fontFamily: 'Poppins',
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 3,
                                               ),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 3,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Container(
-                                  color: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 5),
-                                        if (item.teacher.isNotEmpty)
+                                  Container(
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 5),
+                                          if (item.teacher.isNotEmpty)
+                                            Row(
+                                              children: [
+                                                Icon(Icons.person, size: 16),
+                                                SizedBox(width: 8.0),
+                                                Text(
+                                                  item.teacher,
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: 12,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          const SizedBox(height: 4),
+                                          if (item.room.isNotEmpty)
+                                            Row(
+                                              children: [
+                                                Icon(Icons.meeting_room,
+                                                    size: 16),
+                                                SizedBox(width: 8.0),
+                                                Text(
+                                                  item.room,
+                                                  style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 12,
+                                                      color: Colors.black),
+                                                ),
+                                              ],
+                                            ),
+                                          const SizedBox(height: 4),
                                           Row(
                                             children: [
-                                              Icon(Icons.person, size: 16),
+                                              Icon(Icons.access_time, size: 16),
                                               SizedBox(width: 8.0),
                                               Text(
-                                                item.teacher,
+                                                '${item.start} - ${item.end}',
                                                 style: TextStyle(
                                                   fontFamily: 'Poppins',
                                                   fontSize: 12,
@@ -470,49 +551,19 @@ class _ClassScheduleSeniorHighScreenState
                                               ),
                                             ],
                                           ),
-                                        const SizedBox(height: 4),
-                                        if (item.room.isNotEmpty)
-                                          Row(
-                                            children: [
-                                              Icon(Icons.meeting_room,
-                                                  size: 16),
-                                              SizedBox(width: 8.0),
-                                              Text(
-                                                item.room,
-                                                style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              ),
-                                            ],
-                                          ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.access_time, size: 16),
-                                            SizedBox(width: 8.0),
-                                            Text(
-                                              '${item.start} - ${item.end}',
-                                              style: TextStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 12,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 10),
-                                      ],
+                                          const SizedBox(height: 10),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  )
+                          );
+                        },
+                      ),
+                    )
+                  ],
                 ],
               ),
             ),

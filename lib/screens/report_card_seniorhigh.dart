@@ -11,14 +11,14 @@ import 'package:pushtrial/models/school_info.dart';
 import 'package:pushtrial/models/year_sem.dart';
 import 'package:pushtrial/models/enrolled_stud.dart';
 
-class ReportCard extends StatefulWidget {
-  const ReportCard({super.key});
+class ReportCardSeniorHigh extends StatefulWidget {
+  const ReportCardSeniorHigh({super.key});
 
   @override
-  State<ReportCard> createState() => _ReportCardState();
+  State<ReportCardSeniorHigh> createState() => _ReportCardSeniorHighState();
 }
 
-class _ReportCardState extends State<ReportCard> {
+class _ReportCardSeniorHighState extends State<ReportCardSeniorHigh> {
   Color mainClr = Colors.white;
 
   var id = '0';
@@ -224,9 +224,6 @@ class _ReportCardState extends State<ReportCard> {
         setState(() {
           gradelevel = lastindex.levelid;
         });
-
-        print('Enrollement Data: $enInfoData');
-        // getGrades(1);
       });
     });
   }
@@ -340,11 +337,13 @@ class _ReportCardState extends State<ReportCard> {
                           for (var yr in enInfoData) {
                             if (yr.sydesc == selectedYear) {
                               syid = yr.syid;
-                              selectedSem = sem[0];
                               gradelevel = yr.levelid;
                               sectionid = yr.sectionid;
                               strand = yr.strandid;
-                              getGrades(yr.semid);
+
+                              if (selectedSem.isNotEmpty) {
+                                getGrades(int.parse(selectedSem));
+                              }
                             }
                           }
                         });
@@ -370,7 +369,7 @@ class _ReportCardState extends State<ReportCard> {
             if (gradelevel >= 14)
               Expanded(
                 child: DropdownButtonFormField2<String>(
-                  value: null,
+                  value: selectedSem,
                   items: schoolSem
                       .map((option) => DropdownMenuItem(
                             child: Text(
@@ -385,7 +384,7 @@ class _ReportCardState extends State<ReportCard> {
                       selectedSem = value!;
                       semid = int.parse(selectedSem);
                     });
-                    if (selectedYear.isNotEmpty) {
+                    if (selectedYear.isNotEmpty && selectedSem.isNotEmpty) {
                       getGrades(int.parse(selectedSem));
                     }
                   },
@@ -472,63 +471,69 @@ class _ReportCardState extends State<ReportCard> {
                                 },
                                 border: TableBorder.all(color: Colors.black12),
                                 children: [
+                                  // Header row
                                   TableRow(
                                     decoration: BoxDecoration(
-                                        color: schoolColor.withOpacity(.2)),
-                                    children: const [
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 8.0),
-                                        child: Text(
-                                          'Q1',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
+                                      color: schoolColor.withOpacity(.2),
+                                    ),
+                                    children: [
+                                      if (semid == 1 || semid == 0) ...[
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            'Q1',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 8.0),
-                                        child: Text(
-                                          'Q2',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            'Q2',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 8.0),
-                                        child: Text(
-                                          'Q3',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
+                                      ],
+                                      if (semid == 2 || semid == 0) ...[
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            'Q3',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 8.0),
-                                        child: Text(
-                                          'Q4',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
+                                        const Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            'Q4',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
+                                      ],
+                                      const Padding(
                                         padding:
                                             EdgeInsets.symmetric(vertical: 8.0),
                                         child: Text(
@@ -541,7 +546,7 @@ class _ReportCardState extends State<ReportCard> {
                                           ),
                                         ),
                                       ),
-                                      Padding(
+                                      const Padding(
                                         padding:
                                             EdgeInsets.symmetric(vertical: 8.0),
                                         child: Text(
@@ -556,56 +561,69 @@ class _ReportCardState extends State<ReportCard> {
                                       ),
                                     ],
                                   ),
+                                  // Data row
                                   TableRow(
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: Text(
-                                          grade.q1 != "null" ? grade.q1 : '  ',
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
+                                      if (semid == 1 || semid == 0) ...[
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            grade.q1 != "null"
+                                                ? grade.q1
+                                                : '  ',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: Text(
-                                          grade.q2 != "null" ? grade.q2 : '  ',
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            grade.q2 != "null"
+                                                ? grade.q2
+                                                : '  ',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: Text(
-                                          grade.q3 != "null" ? grade.q3 : '  ',
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
+                                      ],
+                                      if (semid == 2 || semid == 0) ...[
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            grade.q3 != "null"
+                                                ? grade.q3
+                                                : '  ',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: Text(
-                                          grade.q4 != "null" ? grade.q4 : '  ',
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            grade.q4 != "null"
+                                                ? grade.q4
+                                                : '  ',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 12,
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                      ],
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 8.0),

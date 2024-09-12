@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../screens/billing_information.dart';
 import '../screens/report_card.dart';
-import '../screens//report_card_college.dart';
+import '../screens/report_card_college.dart';
+import '../screens/report_card_seniorhigh.dart';
 import 'package:pushtrial/models/user.dart';
 import 'package:pushtrial/models/user_data.dart';
 import 'package:pushtrial/api/api.dart';
@@ -130,6 +131,13 @@ class ActionButtonsState extends State<ActionButtons> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => ReportCardCollege()),
+                    );
+                  } else if (latestInfo.levelid == 14 ||
+                      latestInfo.levelid == 15) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ReportCardSeniorHigh()),
                     );
                   } else {
                     Navigator.push(

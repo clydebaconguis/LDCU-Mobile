@@ -326,7 +326,7 @@ class _ClassScheduleCollegeScreenState
                     children: [
                       Expanded(
                         child: DropdownButtonFormField2<String>(
-                          value: selectedYear,
+                          value: null,
                           items: schoolYear
                               .map((option) => DropdownMenuItem(
                                     child: Text(
@@ -360,7 +360,7 @@ class _ClassScheduleCollegeScreenState
                       if (levelid >= 14) ...[
                         Expanded(
                           child: DropdownButtonFormField2<String>(
-                            value: selectedSem,
+                            value: null,
                             items: schoolSem
                                 .map((option) => DropdownMenuItem(
                                       child: Text(
