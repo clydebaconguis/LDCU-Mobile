@@ -323,11 +323,11 @@ class _HomeScreenState extends State<HomeScreen>
                 color: Colors.white,
                 onPressed: () async {
                   await _initializeData();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Data refreshed'),
-                    ),
-                  );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(
+                  //     content: Text('Data refreshed'),
+                  //   ),
+                  // );
                 },
               ),
               actions: [
