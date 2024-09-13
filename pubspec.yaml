@@ -48,7 +48,6 @@ dependencies:
   syncfusion_flutter_calendar: ^26.2.8
   dropdown_button2: ^2.3.9
   animated_custom_dropdown: 3.1.1
-  path_provider: ^2.1.4
   permission_handler: ^11.3.1
   date_time_format: ^2.0.1
   floating_action_bubble: ^1.1.4
@@ -62,11 +61,14 @@ dependencies:
   image: ^4.2.0
   file_picker: 8.0.7
   url_launcher: ^6.3.0
-  open_file: ^3.5.3
   flutter_file_downloader: ^2.0.0
   flutter_pdfview: ^1.2.7
   auto_size_text: ^3.0.0
   custom_refresh_indicator: ^4.0.1
+  dio: ^5.7.0
+  path_provider: ^2.1.4
+  open_filex: ^4.5.0
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:

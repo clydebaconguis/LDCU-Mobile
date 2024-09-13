@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:pushtrial/api/api.dart';
@@ -10,10 +11,10 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ScholarshipFormScreen extends StatefulWidget {
   const ScholarshipFormScreen({super.key});
@@ -132,6 +133,62 @@ class ScholarshipFormScreenState extends State<ScholarshipFormScreen> {
     }
   }
 
+  Future<void> _downloadFile(String relativeUrl) async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        var status = await Permission.storage.request();
+        if (!status.isGranted) {
+          print('Storage permission denied');
+          return;
+        }
+      }
+
+      final baseUrl = await CallApi().getDomain();
+      final fullUrl = '$baseUrl$relativeUrl';
+      print('Attempting to download file from URL: $fullUrl');
+
+      final fileExtension = fullUrl.split('.').last.toLowerCase();
+
+      final tempDir = await getTemporaryDirectory();
+      final filePath =
+          '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+
+      Dio dio = Dio();
+      Response<ResponseBody> response = await dio.get<ResponseBody>(
+        fullUrl,
+        options: Options(responseType: ResponseType.stream),
+      );
+
+      final file = File(filePath);
+      final raf = file.openSync(mode: FileMode.write);
+      response.data!.stream.listen(
+        (List<int> chunk) {
+          raf.writeFromSync(chunk);
+        },
+        onDone: () async {
+          await raf.close();
+          print('File downloaded to $filePath');
+
+          if (fileExtension == 'pdf') {
+            await OpenFilex.open(filePath);
+          } else if (fileExtension == 'jpg' || fileExtension == 'png') {
+            await OpenFilex.open(filePath);
+          } else {
+            print('Unsupported file type: $fileExtension');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Unsupported file type')),
+            );
+          }
+        },
+        onError: (e) {
+          print('Error downloading file: $e');
+        },
+      );
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,7 +272,7 @@ class ScholarshipFormScreenState extends State<ScholarshipFormScreen> {
                                       if (req.fileurl.isNotEmpty)
                                         InkWell(
                                           onTap: () {
-                                            _launchURL(req.fileurl);
+                                            _downloadFile(req.fileurl);
                                           },
                                           child: Text(
                                             'Download File Attachment',
