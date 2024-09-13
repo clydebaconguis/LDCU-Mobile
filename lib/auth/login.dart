@@ -28,7 +28,7 @@ class _LoginState extends State<LoginScreen> {
 
   bool loading = true;
 
-  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+  Color schoolColor = const Color.fromARGB(0, 255, 255, 255);
 
   Color hexToColor(String hexString) {
     final buffer = StringBuffer();
@@ -103,10 +103,10 @@ class _LoginState extends State<LoginScreen> {
               await prefs.setString(
                   'userlogin', jsonEncode(userLogin.toJson()));
 
-              // String? token = await PushNotifications.getFCMToken();
-              // if (token != null) {
-              //   await _callApi.getSaveToken(user.id, userLogin.type, token);
-              // }
+              String? token = await PushNotifications.getFCMToken();
+              if (token != null) {
+                await _callApi.getSaveToken(user.id, userLogin.type, token);
+              }
 
               Navigator.pushReplacementNamed(context, '/home', arguments: user);
             } else {
@@ -226,7 +226,7 @@ class _LoginState extends State<LoginScreen> {
                         controller: _usernameController,
                         decoration: InputDecoration(
                           labelText: 'Username',
-                          labelStyle: TextStyle(
+                          labelStyle: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
                           ),
@@ -238,7 +238,7 @@ class _LoginState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey),
+                            borderSide: const BorderSide(color: Colors.grey),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
@@ -255,7 +255,7 @@ class _LoginState extends State<LoginScreen> {
                         obscureText: _obscureText,
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          labelStyle: TextStyle(
+                          labelStyle: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
                           ),
@@ -267,7 +267,7 @@ class _LoginState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey),
+                            borderSide: const BorderSide(color: Colors.grey),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           suffixIcon: IconButton(

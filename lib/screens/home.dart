@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen>
   String? pic;
 
   List<SchoolInfo> schoolInfo = [];
-  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+  Color schoolColor = const Color.fromARGB(0, 255, 255, 255);
 
   Color hexToColor(String hexString) {
     final buffer = StringBuffer();
@@ -315,8 +315,8 @@ class _HomeScreenState extends State<HomeScreen>
               leading: IconButton(
                 icon: CachedNetworkImage(
                   imageUrl: "$pic$picurl",
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  placeholder: (context, url) => const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                   width: 100,
                   height: 100,
                 ),
@@ -324,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen>
                 onPressed: () async {
                   await _initializeData();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Data refreshed'),
                     ),
                   );

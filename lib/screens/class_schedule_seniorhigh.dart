@@ -45,7 +45,7 @@ class _ClassScheduleSeniorHighScreenState
   bool loading = true;
 
   List<SchoolInfo> schoolInfo = [];
-  Color schoolColor = Color.fromARGB(0, 255, 255, 255);
+  Color schoolColor = const Color.fromARGB(0, 255, 255, 255);
 
   Color hexToColor(String hexString) {
     final buffer = StringBuffer();
@@ -304,7 +304,7 @@ class _ClassScheduleSeniorHighScreenState
                               .map((option) => DropdownMenuItem(
                                     child: Text(
                                       option.sydesc,
-                                      style: TextStyle(fontSize: 10),
+                                      style: const TextStyle(fontSize: 10),
                                     ),
                                     value: option.id.toString(),
                                   ))
@@ -320,7 +320,7 @@ class _ClassScheduleSeniorHighScreenState
                                 orElse: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(
+                                      content: const Text(
                                         "No Schedule for this School Year",
                                       ),
                                       backgroundColor: schoolColor,
@@ -375,7 +375,7 @@ class _ClassScheduleSeniorHighScreenState
                                 .map((option) => DropdownMenuItem(
                                       child: Text(
                                         option.semester,
-                                        style: TextStyle(fontSize: 10),
+                                        style: const TextStyle(fontSize: 10),
                                       ),
                                       value: option.id.toString(),
                                     ))
@@ -416,7 +416,7 @@ class _ClassScheduleSeniorHighScreenState
                     ),
                   ] else ...[
                     DropdownButtonFormField2<String>(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Select Day',
                         labelStyle: TextStyle(
                           fontFamily: 'Poppins',
@@ -508,11 +508,11 @@ class _ClassScheduleSeniorHighScreenState
                                           if (item.teacher.isNotEmpty)
                                             Row(
                                               children: [
-                                                Icon(Icons.person, size: 16),
-                                                SizedBox(width: 8.0),
+                                                const Icon(Icons.person, size: 16),
+                                                const SizedBox(width: 8.0),
                                                 Text(
                                                   item.teacher,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontFamily: 'Poppins',
                                                     fontSize: 12,
                                                     color: Colors.black,
@@ -524,12 +524,12 @@ class _ClassScheduleSeniorHighScreenState
                                           if (item.room.isNotEmpty)
                                             Row(
                                               children: [
-                                                Icon(Icons.meeting_room,
+                                                const Icon(Icons.meeting_room,
                                                     size: 16),
-                                                SizedBox(width: 8.0),
+                                                const SizedBox(width: 8.0),
                                                 Text(
                                                   item.room,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontFamily: 'Poppins',
                                                       fontSize: 12,
                                                       color: Colors.black),
@@ -539,11 +539,11 @@ class _ClassScheduleSeniorHighScreenState
                                           const SizedBox(height: 4),
                                           Row(
                                             children: [
-                                              Icon(Icons.access_time, size: 16),
-                                              SizedBox(width: 8.0),
+                                              const Icon(Icons.access_time, size: 16),
+                                              const SizedBox(width: 8.0),
                                               Text(
                                                 '${item.start} - ${item.end}',
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontFamily: 'Poppins',
                                                   fontSize: 12,
                                                   color: Colors.black,
